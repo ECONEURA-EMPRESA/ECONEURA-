@@ -67,18 +67,14 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     return (
         <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
             {/* ✅ VIDEO BACKGROUND LAYER */}
-            <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ filter: 'brightness(0.4) contrast(1.1) saturate(1.2)' }}
-            >
-                <source src="/login-bg.mp4" type="video/mp4" />
-                {/* Fallback gradient if video fails */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"></div>
-            </video>
+            {/* ✅ IMAGE BACKGROUND LAYER */}
+            <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style={{
+                    backgroundImage: "url('/login-bg-futuristic.png')",
+                    filter: 'brightness(0.6) contrast(1.2) saturate(1.1)'
+                }}
+            />
 
             {/* Overlay Gradient for Readability */}
             <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
