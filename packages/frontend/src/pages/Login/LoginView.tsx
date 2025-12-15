@@ -121,12 +121,16 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     </h1>
 
                     {/* Subtítulo */}
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         <p
-                            className="text-lg font-medium text-emerald-400/90 tracking-wide uppercase"
-                            style={{ letterSpacing: '0.15em' }}
+                            className="text-lg md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-teal-400 tracking-widest uppercase leading-tight"
+                            style={{
+                                letterSpacing: '0.15em',
+                                textShadow: '0 0 20px rgba(16, 185, 129, 0.4)',
+                                fontFamily: '"Orbitron", "Inter", sans-serif' // Futurista fallback
+                            }}
                         >
-                            {mode === 'login' ? 'Bienvenido a la Colmena' : 'Únete a la Inteligencia'}
+                            BIENVENIDO A TU ECOSISTEMA DE INTELIGENCIA ARTIFICIAL
                         </p>
                     </div>
                 </div>
