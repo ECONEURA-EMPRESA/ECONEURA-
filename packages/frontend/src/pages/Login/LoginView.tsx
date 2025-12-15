@@ -65,13 +65,25 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Animated background lights */}
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/15 rounded-full blur-[140px] animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-cyan-500/15 rounded-full blur-[140px]" style={{ animation: 'pulse 3s ease-in-out infinite 1s' }}></div>
-            <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-teal-500/10 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+            {/* ✅ VIDEO BACKGROUND LAYER */}
+            <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ filter: 'brightness(0.4) contrast(1.1) saturate(1.2)' }}
+            >
+                <source src="/login-bg.mp4" type="video/mp4" />
+                {/* Fallback gradient if video fails */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"></div>
+            </video>
 
-            {/* Floating particles effect */}
+            {/* Overlay Gradient for Readability */}
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
+
+            {/* Floating particles effect (preserved) */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {[...Array(20)].map((_, i) => (
                     <div
@@ -86,7 +98,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 ))}
             </div>
 
-            <div className="bg-gradient-to-br from-white/5 via-white/10 to-white/5 backdrop-blur-3xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] w-full max-w-md p-10 border border-white/10 relative overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-2xl rounded-[32px] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.6)] w-full max-w-md p-10 border border-white/10 relative overflow-hidden group">
                 {/* Inner glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5 pointer-events-none"></div>
 
@@ -95,15 +107,14 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
 
                 {/* Logo y Header */}
                 <div className="text-center mb-10">
-                    <LogoEconeura size="lg" showText={false} darkMode className="mt-16 mb-6" />
+                    <LogoEconeura size="xl" showText={false} darkMode className="mt-6 mb-6 hover:scale-105 transition-transform duration-500" />
 
                     {/* Título ECONEURA */}
                     <h1
-                        className="text-4xl font-black tracking-tight text-white mb-3"
+                        className="text-5xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-emerald-100 to-emerald-200 mb-2"
                         style={{
                             fontFamily: '"Inter", "SF Pro Display", system-ui, -apple-system, sans-serif',
-                            letterSpacing: '-0.03em',
-                            textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                            textShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
                         }}
                     >
                         ECONEURA
@@ -112,128 +123,84 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     {/* Subtítulo */}
                     <div className="space-y-2">
                         <p
-                            className="text-xl font-semibold text-emerald-400"
-                            style={{
-                                fontFamily: '"Inter", "SF Pro Display", system-ui, -apple-system, sans-serif',
-                                letterSpacing: '-0.01em',
-                            }}
+                            className="text-lg font-medium text-emerald-400/90 tracking-wide uppercase"
+                            style={{ letterSpacing: '0.15em' }}
                         >
-                            {mode === 'login' ? 'BIENVENIDO' : 'CREA TU CUENTA'}
-                        </p>
-                        <p
-                            className="text-sm text-slate-300 font-light leading-relaxed"
-                            style={{
-                                fontFamily: '"Inter", "SF Pro Text", system-ui, -apple-system, sans-serif',
-                            }}
-                        >
-                            Accede a tu <span className="font-semibold text-emerald-400">ecosistema de inteligencia colectiva</span>
+                            {mode === 'login' ? 'Bienvenido a la Colmena' : 'Únete a la Inteligencia'}
                         </p>
                     </div>
                 </div>
 
                 {/* Error message */}
                 {error && (
-                    <div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-xl text-red-200 text-sm backdrop-blur-sm">
+                    <div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-2xl text-red-200 text-sm backdrop-blur-xl animate-shake">
                         {error}
                     </div>
                 )}
 
-                {/* OAuth buttons */}
-                <div className="space-y-3 mb-8">
-                    <button
-                        onClick={() => handleOAuthLogin('microsoft')}
-                        className="w-full flex items-center justify-center gap-3 px-5 py-3.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/20 rounded-xl hover:from-blue-500/30 hover:to-purple-500/30 hover:border-white/40 hover:shadow-[0_10px_40px_rgba(99,102,241,0.3)] transition-all duration-300 font-semibold text-white shadow-lg backdrop-blur-md relative overflow-hidden group"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/10 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <span className="relative z-10 flex items-center gap-3">
-                            <svg className="w-5 h-5" viewBox="0 0 24 24">
-                                <path fill="#f25022" d="M0 0h11.377v11.372H0z" />
-                                <path fill="#00a4ef" d="M12.623 0H24v11.372H12.623z" />
-                                <path fill="#7fba00" d="M0 12.628h11.377V24H0z" />
-                                <path fill="#ffb900" d="M12.623 12.628H24V24H12.623z" />
-                            </svg>
-                            Continuar con Microsoft
-                        </span>
-                    </button>
-                </div>
-
-                {/* Divider */}
-                <div className="flex items-center gap-4 my-8">
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                    <span className="text-sm text-slate-400 font-medium px-2">O con email</span>
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                </div>
-
                 {/* Form */}
-                <form onSubmit={onSubmit} className="space-y-4">
+                <form onSubmit={onSubmit} className="space-y-5">
                     {mode === 'register' && (
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Nombre completo</label>
-                            <div className="relative group">
-                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/30 via-emerald-400/20 to-cyan-400/30 opacity-60 group-focus-within:opacity-100 blur-xl transition-all duration-300"></div>
-                                <div className="absolute inset-[1px] rounded-2xl bg-slate-950/60 border border-white/10 backdrop-blur-xl shadow-[0_15px_60px_rgba(0,0,0,0.35)]"></div>
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-300/80 z-10" />
+                        <div className="group/input">
+                            <div className="relative">
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-300/80 group-focus-within/input:text-emerald-400 transition-colors z-10" />
                                 <input
                                     type="text"
                                     value={formState.name}
                                     onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                                    className="relative z-10 w-full pl-12 pr-4 py-3.5 bg-transparent rounded-2xl text-white placeholder:text-slate-400 focus:outline-none focus:ring-0"
-                                    placeholder="Juan Pérez"
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-white/10 rounded-2xl text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 focus:bg-slate-900/80 transition-all duration-300 backdrop-blur-sm"
+                                    placeholder="Nombre completo"
                                     required
                                 />
-                                <div className="absolute -bottom-2 left-8 right-8 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
                             </div>
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
-                        <div className="relative group">
-                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-sky-400/25 via-emerald-400/15 to-sky-500/25 opacity-60 group-focus-within:opacity-100 blur-xl transition-all duration-300"></div>
-                            <div className="absolute inset-[1px] rounded-2xl bg-slate-950/65 border border-white/10 backdrop-blur-xl shadow-[0_15px_60px_rgba(0,0,0,0.35)]"></div>
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-300/80 z-10" />
+                    <div className="group/input">
+                        <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-300/80 group-focus-within/input:text-cyan-400 transition-colors z-10" />
                             <input
                                 type="email"
                                 value={formState.email}
                                 onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                                className="relative z-10 w-full pl-12 pr-4 py-3.5 bg-transparent rounded-2xl text-white placeholder:text-slate-400 focus:outline-none focus:ring-0"
-                                placeholder="tu@email.com"
+                                className="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-white/10 rounded-2xl text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900/80 transition-all duration-300 backdrop-blur-sm"
+                                placeholder="Correo electrónico"
                                 required
                             />
-                            <div className="absolute -bottom-2 left-8 right-8 h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Contraseña</label>
-                        <div className="relative group">
-                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400/25 via-teal-500/20 to-blue-500/25 opacity-60 group-focus-within:opacity-100 blur-xl transition-all duration-300"></div>
-                            <div className="absolute inset-[1px] rounded-2xl bg-slate-950/65 border border-white/10 backdrop-blur-xl shadow-[0_15px_60px_rgba(0,0,0,0.35)]"></div>
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-300/80 z-10" />
+                    <div className="group/input">
+                        <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-300/80 group-focus-within/input:text-emerald-400 transition-colors z-10" />
                             <input
                                 type="password"
                                 value={formState.password}
                                 onChange={(e) => setFormState({ ...formState, password: e.target.value })}
-                                className="relative z-10 w-full pl-12 pr-4 py-3.5 bg-transparent rounded-2xl text-white placeholder:text-slate-400 focus:outline-none focus:ring-0"
-                                placeholder="••••••••"
+                                className="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-white/10 rounded-2xl text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 focus:bg-slate-900/80 transition-all duration-300 backdrop-blur-sm"
+                                placeholder="Contraseña"
                                 required
                             />
-                            <div className="absolute -bottom-2 left-8 right-8 h-px bg-gradient-to-r from-transparent via-teal-400/60 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
                         </div>
                     </div>
 
                     {/* Remember me checkbox */}
                     {mode === 'login' && (
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                id="rememberMe"
-                                checked={rememberMe}
-                                onChange={(e) => setRememberMe(e.target.checked)}
-                                className="w-4 h-4 rounded border-white/20 bg-white/10 text-emerald-500 focus:ring-2 focus:ring-emerald-500 cursor-pointer"
-                            />
-                            <label htmlFor="rememberMe" className="text-sm text-slate-300 cursor-pointer select-none">
-                                Mantener sesión iniciada
+                        <div className="flex items-center gap-3 px-1">
+                            <div className="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="rememberMe"
+                                    checked={rememberMe}
+                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                    className="peer appearance-none w-5 h-5 rounded-md border border-white/20 bg-white/5 checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer transition-all"
+                                />
+                                <svg className="absolute w-3.5 h-3.5 text-white pointer-events-none opacity-0 peer-checked:opacity-100 left-[3px] top-[3px] transition-opacity" viewBox="0 0 14 14" fill="none">
+                                    <path d="M3 7L6 10L11 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                            <label htmlFor="rememberMe" className="text-sm text-slate-300/90 cursor-pointer hover:text-emerald-300 transition-colors select-none">
+                                Recordar mi dispositivo
                             </label>
                         </div>
                     )}
@@ -241,9 +208,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white py-3.5 rounded-xl font-bold hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:scale-105 active:scale-95"
+                        className="w-full relative group overflow-hidden bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white py-4 rounded-2xl font-bold tracking-wide shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_35px_rgba(16,185,129,0.5)] transition-all duration-300 hover:-translate-y-1 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none"
                     >
-                        {isLoading ? 'Cargando...' : mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                            {isLoading ? 'Conectando...' : mode === 'login' ? 'INICIAR SESIÓN' : 'REGISTRARSE'}
+                            {!isLoading && <span className="text-xl">→</span>}
+                        </span>
+                        <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
                     </button>
                 </form>
 
@@ -251,22 +222,19 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 <div className="mt-8 text-center">
                     <button
                         onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-                        className="text-sm text-emerald-400 hover:text-emerald-300 font-semibold hover:underline transition-all duration-200"
+                        className="text-sm text-slate-400 hover:text-white font-medium transition-colors duration-300"
                     >
-                        {mode === 'login' ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
+                        {mode === 'login' ? (
+                            <span>¿Nuevo aquí? <span className="text-emerald-400 font-bold hover:underline">Solicita acceso</span></span>
+                        ) : (
+                            <span>¿Ya eres miembro? <span className="text-emerald-400 font-bold hover:underline">Entra ahora</span></span>
+                        )}
                     </button>
                 </div>
 
                 {/* Footer */}
-                <div className="mt-10 pt-6 border-t border-white/10 text-center text-xs text-slate-400">
-                    Al continuar, aceptas nuestros{' '}
-                    <a href="/terms" target="_blank" className="text-emerald-400 hover:text-emerald-300 font-medium hover:underline transition-colors">
-                        Términos
-                    </a>{' '}
-                    y{' '}
-                    <a href="/privacy" target="_blank" className="text-emerald-400 hover:text-emerald-300 font-medium hover:underline transition-colors">
-                        Privacidad
-                    </a>
+                <div className="mt-10 pt-6 border-t border-white/5 text-center text-[10px] text-slate-500/60 uppercase tracking-widest font-semibold">
+                    Protected by ECONEURA CLOUD SECURITY
                 </div>
             </div>
         </div>
