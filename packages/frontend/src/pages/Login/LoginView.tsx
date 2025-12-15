@@ -121,16 +121,25 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     </h1>
 
                     {/* Subtítulo */}
-                    <div className="space-y-4">
+                    <div className="space-y-1">
                         <p
-                            className="text-lg md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-teal-400 tracking-widest uppercase leading-tight"
+                            className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-teal-400 uppercase tracking-widest"
                             style={{
-                                letterSpacing: '0.15em',
-                                textShadow: '0 0 20px rgba(16, 185, 129, 0.4)',
-                                fontFamily: '"Orbitron", "Inter", sans-serif' // Futurista fallback
+                                letterSpacing: '0.1em',
+                                filter: 'drop-shadow(0 0 10px rgba(16, 185, 129, 0.3))',
+                                fontFamily: '"Orbitron", "Inter", sans-serif'
                             }}
                         >
-                            BIENVENIDO A TU ECOSISTEMA DE INTELIGENCIA ARTIFICIAL
+                            BIENVENIDO
+                        </p>
+                        <p
+                            className="text-sm md:text-base font-bold text-slate-300 uppercase tracking-[0.2em]"
+                            style={{
+                                fontFamily: '"Inter", sans-serif',
+                                textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                            }}
+                        >
+                            A TU ECOSISTEMA DE INTELIGENCIA ARTIFICIAL
                         </p>
                     </div>
                 </div>
