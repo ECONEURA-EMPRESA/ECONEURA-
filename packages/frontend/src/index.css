@@ -1,0 +1,47 @@
+/* ECONEURA Global Styles */
+/* ⚠️ ZONA COMPARTIDA: Cambios aquí afectan a TODA la app */
+
+/* 1. Design Tokens (colores, fuentes, espaciados compartidos) */
+@import './styles/tokens.css';
+
+/* 2. Tailwind Base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3. Reset básico */
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+code {
+  font-family: var(--font-mono);
+}
+
+/* 4. Utilidades globales mínimas */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 
+ * NOTA: Las animaciones específicas de Login (@keyframes float, pulse)
+ * ahora están en: src/pages/Login/login.module.css
+ * 
+ * Las animaciones específicas del Cockpit están en:
+ * src/styles/cockpit.module.css
+ * 
+ * Esto garantiza que cambios en un módulo NO afectan al otro.
+ */

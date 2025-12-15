@@ -1,0 +1,33 @@
+{
+  "name": "econeura-full",
+  "private": true,
+  "version": "1.0.0",
+  "description": "ECONEURA SaaS multi-tenant - Monorepo (backend + frontend) - Arquitectura 2025",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "npm@10.9.0",
+  "workspaces": [
+    "packages/backend",
+    "packages/frontend",
+    "packages/shared",
+    "packages/config"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "start": "node packages/backend/dist/src/index.js",
+    "dev": "turbo run dev --parallel",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/cors": "^2.8.19",
+    "globals": "^16.5.0",
+    "typescript-eslint": "^8.48.1",
+    "turbo": "^2.3.0"
+  }
+}

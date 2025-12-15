@@ -1,0 +1,11 @@
+# Ignore scripts directory
+scripts/
+
+# Ignore test utilities
+tests/unit/
+
+# Ignore build artifacts
+dist/
+*.js
+*.d.ts
+*.js.map

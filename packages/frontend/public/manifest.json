@@ -1,0 +1,27 @@
+{
+  "name": "ECONEURA Cockpit",
+  "short_name": "ECONEURA",
+  "description": "Sistema de 10 NEURA + 40 Agentes Make.com con GPT-4o",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2f7fb",
+  "theme_color": "#10b981",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo-econeura.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-econeura.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "business", "utilities"],
+  "lang": "es",
+  "dir": "ltr"
+}

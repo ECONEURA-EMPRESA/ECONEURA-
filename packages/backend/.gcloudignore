@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.git
+.gitignore
+.gitignore
+README.md
+package-lock.json
+yarn.lock
+
