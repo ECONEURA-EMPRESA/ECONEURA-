@@ -97,9 +97,9 @@ export function LogoEconeura({
             alt="ECONEURA logo"
             className="w-full h-full object-cover relative z-10"
             style={{
-              filter: 'drop-shadow(0 4px 12px rgba(16, 185, 129, 0.5)) brightness(1.08) contrast(1.05)',
+              filter: 'drop-shadow(0 4px 12px rgba(16, 185, 129, 0.5))',
               objectPosition: 'center',
-              transform: 'scale(1.32)',
+              transform: 'scale(1.0)', // Reset scale for user provided image
               transformOrigin: 'center center'
             }}
           />
@@ -126,9 +126,8 @@ export function LogoEconeura({
             ECONEURA
           </span>
           <span
-            className={`relative ${textSizeMap[size]} font-black tracking-tight ${
-              darkMode ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent' : 'text-slate-900'
-            }`}
+            className={`relative ${textSizeMap[size]} font-black tracking-tight ${darkMode ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent' : 'text-slate-900'
+              }`}
             style={{
               fontFamily: '"Inter","SF Pro Display",system-ui',
               letterSpacing: '-0.03em',
