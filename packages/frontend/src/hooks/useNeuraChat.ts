@@ -80,6 +80,15 @@ export function useNeuraChat(activeDept: string, dept: Department, onLogout?: ()
                 }
             });
 
+            if (res.status === 404) {
+                // Stale conversation ID, clear it
+                console.warn('[Chat] Conversation not found (404), clearing local state to start fresh.');
+                setConversationId(null);
+                localStorage.removeItem(`econeura_conversation_${activeDept}`);
+                setChatMsgs([]);
+                return;
+            }
+
             if (res.ok) {
                 const data = await res.json();
                 if (data.success && data.messages && Array.isArray(data.messages)) {
@@ -94,7 +103,7 @@ export function useNeuraChat(activeDept: string, dept: Department, onLogout?: ()
         } catch (err) {
             console.warn('[Chat] Error cargando historial:', err);
         }
-    }, []);
+    }, [activeDept]);
 
     const handleAttachmentUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

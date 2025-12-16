@@ -72,7 +72,7 @@ import { AgentExecutionPanel } from './components/AgentExecutionPanel';
 import { DepartmentSelector } from './components/DepartmentSelector';
 import { DashboardMetrics } from './components/DashboardMetrics';
 import { CRMExecutiveDashboard } from './components/CRMExecutiveDashboard';
-import { CRMPremiumPanel } from './components/CRMPremiumPanel';
+import { CRMDashboard as CRMPremiumPanel } from './features/crm/ui/CommandCenter/CRMDashboard';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Tipo de actividad NEURA

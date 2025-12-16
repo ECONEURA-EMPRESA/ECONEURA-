@@ -1,15 +1,16 @@
-export type NeuraId =
   | 'neura-ceo'
   | 'neura-cto'
   | 'neura-cfo'
   | 'neura-cmo'
-  | 'neura-ventas'
-  | 'neura-atencion-cliente'
+  | 'neura-sales'
+  | 'neura-cs' // Customer Success
   | 'neura-rrhh'
-  | 'neura-operaciones'
+  | 'neura-ops'
   | 'neura-legal'
-  | 'neura-datos'
-  | 'neura-innovacion';
+  | 'neura-data'
+  | 'neura-ino'
+  | 'neura-ia'
+  | 'neura-cso';
 
 export type NeuraDepartment =
   | 'Direccion'
