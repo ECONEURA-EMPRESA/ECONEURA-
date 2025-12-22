@@ -1,5 +1,5 @@
-import React from 'react';
-import logoImage from '../assets/images/logo-econeura.png';
+import React, { useEffect } from 'react';
+import logoImage from '../assets/images/logo-v2.png';
 
 interface LogoEconeuraProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -30,6 +30,10 @@ export function LogoEconeura({
   className = '',
   darkMode = false
 }: LogoEconeuraProps) {
+  useEffect(() => {
+    console.log('Logo debug:', { logoImage, publicFallback: '/logo-v2.png' });
+  }, []);
+
   const dimension = dimensionMap[size] ?? 56;
   const ringGradient = darkMode
     ? 'linear-gradient(135deg, rgba(16,185,129,0.8), rgba(6,182,212,0.8), rgba(59,130,246,0.8))'
@@ -62,13 +66,13 @@ export function LogoEconeura({
           className="absolute inset-2 rounded-full overflow-hidden flex items-center justify-center bg-slate-900 z-10"
         >
           <img
-            src={logoImage || '/logo-econeura.png'}
+            src={logoImage || '/logo-v2.png'}
             alt="ECONEURA logo"
             className="w-full h-full object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = '/logo-econeura.png';
+              target.src = '/logo-v2.png';
             }}
           />
         </div>
