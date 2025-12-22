@@ -62,9 +62,14 @@ export function LogoEconeura({
           className="absolute inset-2 rounded-full overflow-hidden flex items-center justify-center bg-slate-900 z-10"
         >
           <img
-            src={logoImage}
+            src={logoImage || '/logo-econeura.png'}
             alt="ECONEURA logo"
             className="w-full h-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src = '/logo-econeura.png';
+            }}
           />
         </div>
       </div>
