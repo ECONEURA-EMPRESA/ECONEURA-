@@ -48,8 +48,8 @@ export const useAuthLogic = () => {
 
         try {
             // Safety check for Firebase Init - CAST TO ANY TO AVOID TS ERROR
-            const safeAuth = auth as any;
-            if (!safeAuth || !safeAuth.signInWithEmailAndPassword) {
+            const safeAuth = auth;
+            if (!safeAuth) {
                 throw new Error('APP_CONFIG_ERROR: Firebase no está configurado. Revisa tu archivo .env');
             }
 

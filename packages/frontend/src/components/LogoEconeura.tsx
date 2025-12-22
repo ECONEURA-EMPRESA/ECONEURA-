@@ -12,8 +12,8 @@ const dimensionMap: Record<NonNullable<LogoEconeuraProps['size']>, number> = {
   xs: 32,
   sm: 40,
   md: 56,
-  lg: 96,
-  xl: 128
+  lg: 112,
+  xl: 160
 };
 
 const textSizeMap: Record<NonNullable<LogoEconeuraProps['size']>, string> = {
@@ -21,7 +21,7 @@ const textSizeMap: Record<NonNullable<LogoEconeuraProps['size']>, string> = {
   sm: 'text-lg',
   md: 'text-xl',
   lg: 'text-2xl',
-  xl: 'text-3xl'
+  xl: 'text-4xl'
 };
 
 export function LogoEconeura({
@@ -63,7 +63,7 @@ export function LogoEconeura({
 
         {/* Image Container */}
         <div
-          className="absolute inset-3 rounded-full overflow-hidden flex items-center justify-center bg-slate-900 z-10"
+          className="absolute inset-4 rounded-full overflow-hidden flex items-center justify-center bg-slate-900 z-10"
         >
           <img
             src={logoImage || '/logo-v2.png'}
