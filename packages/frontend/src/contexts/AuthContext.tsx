@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { Shield, User, Lock, Key } from 'lucide-react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '../config/firebase';
 
 export type UserRole = 'admin' | 'manager' | 'user' | 'guest';
 export type Permission =
@@ -77,52 +79,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar sesión guardada
-    const savedUser = localStorage.getItem('econeura-user');
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
-      } catch {
-        // Error parsing - limpiar datos corruptos
-        localStorage.removeItem('econeura-user');
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // Recover user data mainly from localStorage if enriched, or construct basic
+        const savedUser = localStorage.getItem('econeura_user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        } else {
+          // Fallback if localStorage missing but auth persists
+          setUser({
+            id: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            name: firebaseUser.displayName || 'Usuario',
+            role: 'admin', // Default to admin for owner
+            permissions: ROLE_PERMISSIONS.admin, // Default permissions
+            isActive: true,
+            lastLogin: new Date()
+          });
+        }
+      } else {
+        setUser(null);
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-
-    try {
-      // Simular autenticación (en producción sería una llamada a la API)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const foundUser = DEMO_USERS.find(u => u.email === email);
-
-      if (foundUser && password === 'demo123') {
-        const userWithLogin = {
-          ...foundUser,
-          lastLogin: new Date()
-        };
-
-        setUser(userWithLogin);
-        localStorage.setItem('econeura-user', JSON.stringify(userWithLogin));
-        return true;
-      }
-
-      return false;
-    } catch {
-      // Login error manejado en UI
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
+    // Login handled by useAuthLogic directly via Firebase SDK
+    return true;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await signOut(auth);
     setUser(null);
-    localStorage.removeItem('econeura-user');
+    localStorage.removeItem('econeura_user');
+    localStorage.removeItem('econeura_token');
   };
 
   const hasPermission = (permission: Permission): boolean => {
@@ -140,7 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const updatedUser = { ...user, ...updates };
     setUser(updatedUser);
-    localStorage.setItem('econeura-user', JSON.stringify(updatedUser));
+    localStorage.setItem('econeura_user', JSON.stringify(updatedUser));
   }, [user]);
 
   return (

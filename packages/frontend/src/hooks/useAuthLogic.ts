@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { z } from 'zod';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../config/firebase';
 import { API_URL } from '../config/api';
 
 export const loginSchema = z.object({
@@ -45,28 +47,28 @@ export const useAuthLogic = () => {
         setLoading(true);
 
         try {
-            const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
-            const body = mode === 'login'
-                ? { email: formState.email, password: formState.password }
-                : { email: formState.email, password: formState.password, name: formState.name };
-
-            const response = await fetch(`${API_URL.replace('/api', '')}${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Authentication failed');
+            let userCredential;
+            if (mode === 'login') {
+                userCredential = await signInWithEmailAndPassword(auth, formState.email, formState.password);
+            } else {
+                userCredential = await createUserWithEmailAndPassword(auth, formState.email, formState.password);
+                // Optional: Update profile with name
+                // await updateProfile(userCredential.user, { displayName: formState.name });
             }
 
-            const data = await response.json();
+            const firebaseUser = userCredential.user;
+            const token = await firebaseUser.getIdToken();
+
+            const user: User = {
+                id: firebaseUser.uid,
+                email: firebaseUser.email || '',
+                name: firebaseUser.displayName || formState.name || 'Usuario',
+            };
 
             // Guardar token según "Remember me"
             const storage = rememberMe ? localStorage : sessionStorage;
-            storage.setItem('econeura_token', data.token);
-            storage.setItem('econeura_user', JSON.stringify(data.user));
+            storage.setItem('econeura_token', token);
+            storage.setItem('econeura_user', JSON.stringify(user));
 
             // Limpiar del otro storage
             const otherStorage = rememberMe ? sessionStorage : localStorage;
@@ -74,27 +76,22 @@ export const useAuthLogic = () => {
             otherStorage.removeItem('econeura_user');
 
             // Retornar token y user para que el componente los use
-            return { token: data.token, user: data.user as User };
+            return { token, user };
         } catch (err: unknown) {
             let errorMessage = 'Error de conexión';
 
             const error = err instanceof Error ? err : new Error(String(err));
-            if (error.message) {
-                if (error.message.includes('Invalid credentials') || error.message.includes('Authentication failed')) {
-                    errorMessage = 'Email o contraseña incorrectos';
-                } else if (error.message.includes('User not found')) {
-                    errorMessage = mode === 'login'
-                        ? 'Usuario no encontrado. ¿Necesitas registrarte?'
-                        : 'Error al crear usuario';
-                } else if (error.message.includes('Email already exists')) {
-                    errorMessage = 'Este email ya está registrado. ¿Quieres iniciar sesión?';
-                } else if (error.message.includes('Network')) {
-                    errorMessage = 'Sin conexión a internet. Verifica tu red';
-                } else if (error.message.includes('timeout')) {
-                    errorMessage = 'El servidor tardó demasiado en responder. Inténtalo de nuevo';
-                } else {
-                    errorMessage = error.message;
-                }
+            // Firebase Error Mapping
+            if (error.message.includes('auth/invalid-credential') || error.message.includes('auth/user-not-found') || error.message.includes('auth/wrong-password')) {
+                errorMessage = 'Email o contraseña incorrectos';
+            } else if (error.message.includes('auth/email-already-in-use')) {
+                errorMessage = 'Este email ya está registrado. ¿Quieres iniciar sesión?';
+            } else if (error.message.includes('auth/weak-password')) {
+                errorMessage = 'La contraseña es muy débil (mínimo 6 caracteres)';
+            } else if (error.message.includes('auth/network-request-failed')) {
+                errorMessage = 'Sin conexión a internet. Verifica tu red';
+            } else {
+                errorMessage = error.message;
             }
 
             setError(errorMessage);
