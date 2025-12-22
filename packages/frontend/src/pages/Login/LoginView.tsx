@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useAuthLogic } from '../../hooks/useAuthLogic';
 import { Mail, Lock, User } from 'lucide-react';
 import { LogoEconeura } from '../../components/LogoEconeura';
+import './login.css';
 
 interface LoginViewProps {
     onLoginSuccess: (token: string, user: {

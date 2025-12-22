@@ -2,7 +2,7 @@
 /* Este archivo SOLO afecta al Login. Cambios aquí NO rompen el Cockpit. */
 
 /* Animaciones exclusivas del Login */
-@keyframes login-pulse {
+@keyframes pulse {
 
     0%,
     100% {
@@ -14,7 +14,7 @@
     }
 }
 
-@keyframes login-float {
+@keyframes float {
 
     0%,
     100% {
