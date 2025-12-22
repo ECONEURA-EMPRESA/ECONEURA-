@@ -15,7 +15,7 @@ if (!fs.existsSync(logsDir)) {
   try {
     fs.mkdirSync(logsDir, { recursive: true });
   } catch (err) {
-    // En Azure App Service, puede no tener permisos, usar console
+    // En Cloud Run, puede no tener permisos, usar console
     // ✅ AUDITORÍA: console.warn justificado aquí (bootstrap, logger aún no inicializado)
 
     console.warn('[Logger] No se pudo crear directorio de logs:', (err as Error).message);

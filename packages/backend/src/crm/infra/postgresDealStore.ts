@@ -135,7 +135,7 @@ export async function updateDeal(
   dealId: string,
   updates: Partial<Deal>
 ): Promise<Result<Deal, Error>> {
-  return retryDatabase(
+  return retryDatabase<Result<Deal, Error>>(
     async () => {
       const client = await getPostgresPool().connect();
 
@@ -213,14 +213,16 @@ export async function updateDeal(
         await client.query('COMMIT');
 
         const row = result.rows[0];
-        return ok({
+        const dealData = {
           ...row,
           created_at: new Date(row.created_at),
           updated_at: new Date(row.updated_at),
           meeting_date: row.meeting_date ? new Date(row.meeting_date) : undefined,
           proposal_sent_at: row.proposal_sent_at ? new Date(row.proposal_sent_at) : undefined,
           closed_date: row.closed_date ? new Date(row.closed_date) : undefined
-        } as Deal);
+        } as Deal;
+
+        return ok(dealData);
       } catch (error: unknown) {
         await client.query('ROLLBACK').catch(() => {
           // Ignorar errores al hacer rollback

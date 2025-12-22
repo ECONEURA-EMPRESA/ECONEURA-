@@ -2,17 +2,21 @@ import React from 'react';
 import { Settings, Menu, X } from 'lucide-react';
 
 interface EconeuraHeaderProps {
-  isDarkMode: boolean;
-  onToggleSettings: () => void;
+  user?: {
+    name: string;
+    email: string;
+  } | null;
+  onLogout?: () => void;
   onToggleMenu: () => void;
-  isMenuOpen: boolean;
+  // onToggleSettings y isMenuOpen no se usan en el layout nuevo pero los mantengo opcionales o los quito si sobran
+  onOpenMobileMenu?: () => void;
+  activeDept?: any; // Fix type later
 }
 
 export function EconeuraHeader({
-  isDarkMode: _isDarkMode,
-  onToggleSettings,
+  user,
+  onLogout,
   onToggleMenu,
-  isMenuOpen
 }: EconeuraHeaderProps) {
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-slate-200/40 dark:border-gray-700/40">
@@ -40,19 +44,7 @@ export function EconeuraHeader({
               className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 transition-all duration-200"
               title="Menú"
             >
-              {isMenuOpen ? (
-                <X className="w-5 h-5 text-slate-600 dark:text-gray-300" />
-              ) : (
-                <Menu className="w-5 h-5 text-slate-600 dark:text-gray-300" />
-              )}
-            </button>
-
-            <button
-              onClick={onToggleSettings}
-              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 transition-all duration-200"
-              title="Configuración"
-            >
-              <Settings className="w-5 h-5 text-slate-600 dark:text-gray-300" />
+              <Menu className="w-5 h-5 text-slate-600 dark:text-gray-300" />
             </button>
           </div>
         </div>

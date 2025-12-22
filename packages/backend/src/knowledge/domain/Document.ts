@@ -11,7 +11,7 @@ export interface Document {
   originalName: string;
   mimeType: string;
   sizeBytes: number;
-  storageProvider: 'azure-blob' | 'local';
+  storageProvider: 'google-cloud-storage' | 'local';
   storagePath: string;
   status: 'uploaded' | 'processing' | 'ingested' | 'failed';
   chunksCount: number;

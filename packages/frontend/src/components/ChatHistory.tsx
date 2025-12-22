@@ -67,8 +67,8 @@ export function ChatHistory({ isOpen, onClose, token }: ChatHistoryProps) {
     if (!confirm('¿Eliminar este chat?')) return;
 
     try {
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const apiUrl = isLocalhost ? 'http://localhost:3000' : 'https://econeura-backend-production.azurewebsites.net';
+      // Uso de API_URL centralizada (Google Cloud Native)
+      const apiUrl = API_URL;
 
       const response = await fetch(`${apiUrl}/api/chats/${chatId}`, {
         method: 'DELETE',

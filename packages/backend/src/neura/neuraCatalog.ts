@@ -1,5 +1,7 @@
 import { ok, err, type Result } from '../shared/Result';
-import type { NeuraId, NeuraDepartment } from '../shared/types';
+
+export type NeuraId = string;
+export type NeuraDepartment = string;
 
 export interface NeuraDefinition {
   id: NeuraId;

@@ -58,12 +58,11 @@ Los smoke tests se ejecutan después de cada despliegue para verificar que:
 ### Secrets Requeridos
 
 **Infraestructura:**
-- `AZURE_CREDENTIALS` – Service principal JSON para login (formato: `{"clientId":"...","clientSecret":"...","subscriptionId":"...","tenantId":"..."}`).
+- `GCP_SA_KEY` – Service Account JSON para despliegue (Google Cloud).
 
 **Aplicación:**
-- `AZURE_WEBAPP_NAME_BACKEND` – Nombre del App Service backend (ej: `app-econeura-full-staging-backend`).
-- `AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND` – Publish profile XML del App Service backend (descargado desde Azure Portal → App Service → Get publish profile).
-- `AZURE_STATIC_WEB_APPS_API_TOKEN` – Token de Static Web Apps (generado desde Azure Portal → Static Web App → Manage deployment token).
+- `GCP_PROJECT_ID` – ID del proyecto Google Cloud (e.g., `econeura-109cc`).
+- `GCP_SA_KEY` – Clave JSON de Service Account con permisos de despliegue.
 
 **Runtime (Key Vault o GitHub Secrets):**
 - `DATABASE_URL` – Connection string completa de PostgreSQL.

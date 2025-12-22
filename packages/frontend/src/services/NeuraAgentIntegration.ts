@@ -63,7 +63,7 @@ const analyzeContext = (userInput: string, dept: string): { summary: string; str
 const analyzeReasoning = (userInput: string, dept: string): string => {
   const keywords = userInput.toLowerCase();
 
-  const reasoningTemplates = {
+  const reasoningTemplates: Record<string, string> = {
     'NEURA CEO': 'Como CEO, aplico pensamiento estratégico sistémico, considerando impacto organizacional, alineación con objetivos corporativos y maximización del valor para stakeholders.',
     'NEURA CFO': 'Como CFO, aplico rigor financiero y análisis de viabilidad económica, evaluando costos, beneficios, riesgos financieros y retorno de inversión para optimizar recursos.',
     'NEURA CMO': 'Como CMO, analizo el impacto en la experiencia del cliente, posicionamiento de marca y estrategias de marketing para maximizar engagement y conversión.',
@@ -71,7 +71,7 @@ const analyzeReasoning = (userInput: string, dept: string): string => {
     'NEURA CHRO': 'Como CHRO, considero el impacto en el talento, desarrollo del equipo, cultura organizacional y capacidades humanas necesarias para el éxito.'
   };
 
-  let reasoning = (reasoningTemplates as any)[dept] || 'Aplicando análisis especializado del departamento correspondiente para proporcionar insights relevantes y accionables.';
+  let reasoning = reasoningTemplates[dept] || 'Aplicando análisis especializado del departamento correspondiente para proporcionar insights relevantes y accionables.';
 
   // Personalizar razonamiento basado en palabras clave
   if (keywords.includes('análisis') || keywords.includes('evaluar')) {
@@ -127,7 +127,7 @@ export const shouldExecuteAgentsForNeura = (agentId: string, userInput: string):
   const dept = getDepartmentFromAgentId(agentId);
 
   // Palabras clave de acción más específicas por departamento
-  const actionKeywords = {
+  const actionKeywords: Record<string, string[]> = {
     'NEURA CEO': ['ejecutar', 'implementar', 'estratégico', 'decisión', 'liderazgo', 'objetivo', 'visión'],
     'NEURA CFO': ['calcular', 'presupuesto', 'inversión', 'roi', 'análisis financiero', 'costo', 'beneficio'],
     'NEURA CMO': ['marketing', 'promoción', 'cliente', 'ventas', 'branding', 'campaña', 'engagement'],
@@ -135,7 +135,7 @@ export const shouldExecuteAgentsForNeura = (agentId: string, userInput: string):
     'NEURA CHRO': ['equipo', 'talento', 'capacitación', 'recursos humanos', 'desarrollo', 'personal', 'organización']
   };
 
-  const relevantKeywords = (actionKeywords as any)[dept] || [];
+  const relevantKeywords = actionKeywords[dept] || [];
   const hasActionKeywords = relevantKeywords.some((keyword: string) => keywords.includes(keyword));
 
   // Palabras clave generales de acción
@@ -157,7 +157,7 @@ export const calculateAgentConfidence = (agentId: string, userInput: string, con
   let confidence = 0.5; // Base confidence
 
   // Palabras clave específicas por departamento con pesos
-  const deptKeywords = {
+  const deptKeywords: Record<string, Record<string, number>> = {
     'NEURA CEO': { 'estrategia': 0.2, 'visión': 0.2, 'objetivo': 0.15, 'liderazgo': 0.15, 'decisión': 0.15, 'ejecutivo': 0.15 },
     'NEURA CFO': { 'presupuesto': 0.2, 'costo': 0.2, 'inversión': 0.15, 'roi': 0.15, 'financiero': 0.15, 'económico': 0.15 },
     'NEURA CMO': { 'marketing': 0.2, 'cliente': 0.2, 'ventas': 0.15, 'branding': 0.15, 'promoción': 0.15, 'publicidad': 0.15 },
@@ -165,7 +165,7 @@ export const calculateAgentConfidence = (agentId: string, userInput: string, con
     'NEURA CHRO': { 'equipo': 0.2, 'talento': 0.2, 'recursos humanos': 0.15, 'capacitación': 0.15, 'personal': 0.15, 'empleado': 0.15 }
   };
 
-  const relevantKeywords = (deptKeywords as any)[dept] || {};
+  const relevantKeywords = deptKeywords[dept] || {};
   let keywordScore = 0;
 
   Object.entries(relevantKeywords).forEach(([keyword, weight]) => {
@@ -200,7 +200,7 @@ export const getSuggestedAgents = (agentId: string, userInput: string): string[]
   const keywords = userInput.toLowerCase();
 
   // Mapeo de agentes por departamento y contexto
-  const agentMapping = {
+  const agentMapping: Record<string, Record<string, string[]>> = {
     'NEURA CEO': {
       'estrategia': ['a-ceo-01', 'a-cfo-01', 'a-cmo-01'],
       'liderazgo': ['a-ceo-01', 'a-chro-01'],
@@ -228,7 +228,7 @@ export const getSuggestedAgents = (agentId: string, userInput: string): string[]
     }
   };
 
-  const deptMapping = (agentMapping as any)[dept] || {};
+  const deptMapping = agentMapping[dept] || {};
   const suggestedAgents: string[] = [];
 
   Object.entries(deptMapping).forEach(([keyword, agents]) => {
@@ -239,14 +239,14 @@ export const getSuggestedAgents = (agentId: string, userInput: string): string[]
 
   // Si no hay agentes específicos, devolver agentes por defecto del departamento
   if (suggestedAgents.length === 0) {
-    const defaultAgents = {
+    const defaultAgents: Record<string, string[]> = {
       'NEURA CEO': ['a-ceo-01'],
       'NEURA CFO': ['a-cfo-01'],
       'NEURA CMO': ['a-cmo-01'],
       'NEURA CTO': ['a-cto-01'],
       'NEURA CHRO': ['a-chro-01']
     };
-    return (defaultAgents as any)[dept] || ['a-ceo-01'];
+    return defaultAgents[dept] || ['a-ceo-01'];
   }
 
   return [...new Set(suggestedAgents)]; // Eliminar duplicados

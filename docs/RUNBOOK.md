@@ -7,7 +7,7 @@ This runbook consolidates all operational commands and procedures for the ECONEU
 ### Prerequisites
 - Node.js 18+
 - Docker & Docker Compose
-- Azure CLI
+- Google Cloud CLI
 
 ### Installation
 ```bash
@@ -53,8 +53,8 @@ npm run build
 docker-compose build
 ```
 
-### Azure Deployment
-Refer to `README-DEPLOYMENT.md` for detailed Azure deployment steps.
+### Google Cloud Deployment
+Refer to `README.md` for detailed Google Cloud deployment steps.
 
 ## 🛠️ Troubleshooting
 

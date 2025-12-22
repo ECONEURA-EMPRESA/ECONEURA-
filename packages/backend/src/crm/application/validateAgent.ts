@@ -7,7 +7,7 @@
 
 import { getPostgresPool } from '../../infra/persistence/postgresPool';
 import { logger } from '../../shared/logger';
-import { automationAgents } from '../../automation/automationAgentsRegistry';
+import { agentRepository } from '../../automation/infra/persistence/InMemoryAgentRepository';
 
 /**
  * Validar que un agente existe y pertenece al departamento
@@ -21,7 +21,9 @@ export async function validateAgent(
   }
 
   // 1. Verificar en automationAgentsRegistry (agentes registrados)
-  const registeredAgent = automationAgents.find(
+  // 1. Verificar en automationAgentsRegistry (agentes registrados)
+  const allAgents = agentRepository.findAll();
+  const registeredAgent = allAgents.find(
     (a) =>
       a.name === agentName &&
       (a.neuraKey === department || a.neuraKey === 'cmo' || a.neuraKey === 'cso')
@@ -86,7 +88,9 @@ export async function validateAgentDepartment(
   }
 
   // Verificar que el agente realmente pertenece al departamento
-  const registeredAgent = automationAgents.find((a) => a.name === agentName);
+  // Verificar que el agente realmente pertenece al departamento
+  const allAgents = agentRepository.findAll();
+  const registeredAgent = allAgents.find((a) => a.name === agentName);
   if (registeredAgent) {
     if (registeredAgent.neuraKey !== department && registeredAgent.neuraKey !== 'cmo' && registeredAgent.neuraKey !== 'cso') {
       return {

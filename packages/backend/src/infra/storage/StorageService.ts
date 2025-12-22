@@ -1,5 +1,5 @@
 /**
- * Puerto para servicios de almacenamiento (Azure Blob Storage, local, etc.)
+ * Puerto para servicios de almacenamiento (Google Cloud Storage, local, etc.)
  */
 export interface StorageService {
   uploadBuffer(

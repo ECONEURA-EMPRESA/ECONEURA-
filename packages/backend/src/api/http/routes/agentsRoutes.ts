@@ -5,8 +5,8 @@
  */
 import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
-import { automationService } from '../../../automation/automationService';
-import { getAutomationAgentById, automationAgents } from '../../../automation/automationAgentsRegistry';
+import { automationService } from '../../../automation/application/services/AutomationService';
+import { agentRepository } from '../../../automation/infra/persistence/InMemoryAgentRepository';
 import { sendResult } from '../httpResult';
 import { logger } from '../../../shared/logger';
 import type { RequestWithId } from '../../http/middleware/requestId';
@@ -50,7 +50,8 @@ router.get('/', async (req: Request, res: Response) => {
 
     // Por ahora, listamos todos los agentes del registry
     // En el futuro, esto vendrá de la base de datos
-    const allAgents = automationAgents.filter((a) => a.active);
+    // Listar usando el repositorio
+    const allAgents = agentRepository.findAll();
 
     let filtered = allAgents;
 
@@ -98,9 +99,9 @@ router.get('/:id', async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: 'ID requerido' });
     }
 
-    const agentResult = getAutomationAgentById(id);
+    const agentResult = agentRepository.findById(id);
 
-    if (!agentResult.success) {
+    if (!agentResult.success || !agentResult.data) {
       return res.status(404).json({
         success: false,
         error: 'Agente no encontrado'
@@ -148,9 +149,9 @@ router.post('/:id/execute', async (req: Request, res: Response) => {
 
     const parsed = executeAgentSchema.parse(req.body);
 
-    const agentResult = getAutomationAgentById(id);
+    const agentResult = agentRepository.findById(id);
 
-    if (!agentResult.success) {
+    if (!agentResult.success || !agentResult.data) {
       return res.status(404).json({
         success: false,
         error: 'Agente no encontrado'

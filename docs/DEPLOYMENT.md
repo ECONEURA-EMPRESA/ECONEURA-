@@ -27,7 +27,7 @@
 ### 4. Verificar
 
 ```powershell
-.\scripts\health-check-complete.ps1 -BackendUrl "https://app-econeura-full-staging-backend.azurewebsites.net"
+.\scripts\health-check-complete.ps1 -BackendUrl "https://econeura-backend-xyz.a.run.app"
 ```
 
 ---
@@ -45,7 +45,7 @@
 
 - `scripts/validate-all.ps1` - Validación completa
 - `scripts/validate-pre-deploy.ps1` - Validación local
-- `scripts/validate-azure-resources.ps1` - Validación Azure
+- `scripts/validate-gcp-resources.ps1` - Validación GCP
 - `scripts/health-check-complete.ps1` - Health check post-deploy
 - `scripts/fix-common-issues.ps1` - Corrección automática
 

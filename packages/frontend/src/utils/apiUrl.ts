@@ -10,13 +10,13 @@
 /**
  * Obtener la URL base de la API según el entorno
  * 
- * @returns URL base de la API (localhost en dev, Azure en producción)
+ * @returns URL base de la API (localhost en dev, relativo en producción)
  * 
  * @example
  * ```typescript
  * const apiUrl = getApiUrl();
  * // Dev: 'http://localhost:3000'
- * // Prod: 'https://econeura-backend-production.azurewebsites.net'
+ * // Prod: '' (Relative path)
  * ```
  */
 export function getApiUrl(): string {
@@ -30,7 +30,7 @@ export function getApiUrl(): string {
 
   return isLocalhost
     ? 'http://localhost:3000'
-    : 'https://econeura-backend-production.azurewebsites.net';
+    : ''; // Relative path for Google Cloud Run (proxied via Firebase)
 }
 
 /**

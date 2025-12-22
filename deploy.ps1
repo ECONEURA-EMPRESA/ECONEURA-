@@ -11,7 +11,7 @@ Write-Host ">>> PROYECTO: $PROJECT_ID" -ForegroundColor Gray
 # 0. CHECKS & PATH FIX
 $TargetTerraform = "terraform"
 if (-not (Get-Command terraform -ErrorAction SilentlyContinue)) {
-    $WingetPath = "$env:LOCALAPPDATA\Microsoft\WinGet\Links\terraform.exe"
+    $WingetPath = "$env:LOCALAPPDATA/Programs/Common/terraform.exe"
     if (Test-Path $WingetPath) {
         Write-Host "WARING: Terraform encontrado en WinGet." -ForegroundColor Gray
         $TargetTerraform = $WingetPath
@@ -59,6 +59,8 @@ try {
     gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$ComputeSA" --role="roles/logging.logWriter" --condition=None --quiet
     gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$ComputeSA" --role="roles/artifactregistry.admin" --condition=None --quiet
     gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$ComputeSA" --role="roles/cloudsql.client" --condition=None --quiet
+    gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$ComputeSA" --role="roles/secretmanager.secretAccessor" --condition=None --quiet
+
 
     # Cloud Build SA (CRITICAL for logs and registry)
     gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$CloudBuildSA" --role="roles/logging.logWriter" --condition=None --quiet
@@ -99,6 +101,7 @@ if (Test-Path $BackendPath) {
         --source . `
         --region us-central1 `
         --allow-unauthenticated `
+        --set-env-vars "USE_MEMORY_STORE=true,NODE_ENV=production" `
         --project $PROJECT_ID `
         --quiet
     Set-Location ../..

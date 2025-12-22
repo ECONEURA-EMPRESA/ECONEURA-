@@ -17,7 +17,7 @@ import { mapPostgresError, isPostgresError } from '../../shared/utils/postgresEr
  * Maneja duplicados elegantly (retorna lead existente si email duplicado)
  */
 export async function createLead(lead: Lead): Promise<Result<Lead, Error>> {
-  return retryDatabase(
+  return retryDatabase<Result<Lead, Error>>(
     async () => {
       const client = await getPostgresPool().connect();
 
@@ -49,12 +49,14 @@ export async function createLead(lead: Lead): Promise<Result<Lead, Error>> {
         );
 
         const row = result.rows[0];
-        return ok({
+        const leadData = {
           ...row,
           enrichment_data: typeof row.enrichment_data === 'string' ? JSON.parse(row.enrichment_data) : row.enrichment_data,
           created_at: new Date(row.created_at),
           updated_at: new Date(row.updated_at)
-        } as Lead);
+        } as Lead;
+
+        return ok(leadData);
       } catch (error: unknown) {
         // Manejar duplicados elegantly
         if (isPostgresError(error)) {
@@ -295,7 +297,7 @@ export async function updateLead(
   leadId: string,
   updates: Partial<Pick<Lead, 'score' | 'status' | 'assigned_agent' | 'enrichment_data'>>
 ): Promise<Result<Lead, Error>> {
-  return retryDatabase(
+  return retryDatabase<Result<Lead, Error>>(
     async () => {
       const client = await getPostgresPool().connect();
 
@@ -353,12 +355,14 @@ export async function updateLead(
         }
 
         const row = result.rows[0];
-        return ok({
+        const leadData = {
           ...row,
           enrichment_data: typeof row.enrichment_data === 'string' ? JSON.parse(row.enrichment_data) : row.enrichment_data,
           created_at: new Date(row.created_at),
           updated_at: new Date(row.updated_at)
-        } as Lead);
+        } as Lead;
+
+        return ok(leadData);
       } catch (error: unknown) {
         if (isPostgresError(error)) {
           throw mapPostgresError(error);

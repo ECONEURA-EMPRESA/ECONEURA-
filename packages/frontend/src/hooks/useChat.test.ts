@@ -52,9 +52,9 @@ describe('useChat Hook', () => {
     expect(result.current.messages).toEqual([]);
   });
 
-  it('should detect azurestaticapps.net as production', () => {
+  it('should detect cloud run url as production', () => {
     Object.defineProperty(window, 'location', {
-      value: { hostname: 'happy-pebble-0553f1003.3.azurestaticapps.net' },
+      value: { hostname: 'econeura-backend-xyz.a.run.app' },
       writable: true
     });
 

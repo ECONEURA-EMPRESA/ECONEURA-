@@ -1,4 +1,4 @@
-import { AutomationAgent } from '../types';
+import { AutomationAgent } from '../domain/entities/AutomationAgent';
 
 export const automationAgents: AutomationAgent[] = [
     {

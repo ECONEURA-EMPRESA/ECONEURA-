@@ -258,7 +258,7 @@ router.get('/:id/download', async (req: Request, res: Response) => {
     const { id } = req.params;
 
     // Por ahora, retornamos 404
-    // En el futuro, esto descargará desde Azure Blob Storage
+    // En el futuro, esto descargará desde Google Cloud Storage
     logger.info('[Library API] Descargando documento (stub)', {
       documentId: id,
       requestId: reqWithId.id

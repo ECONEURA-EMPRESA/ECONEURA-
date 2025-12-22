@@ -36,6 +36,10 @@ const envSchema = z.object({
   PUBLIC_UPLOAD_BASE_URL: z.string().optional(),
   CRM_WEBHOOK_SECRET: z.string().optional(),
 
+  // Billing (Stripe)
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+
   // Storage & Persistent
   REDIS_URL: z.string().optional().transform(v => {
     if (v === 'undefined' || v === 'null' || v?.trim() === '') return undefined;

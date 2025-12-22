@@ -1,6 +1,6 @@
 /**
  * Health Check Routes
- * Endpoint para verificar salud del sistema (usado por Kubernetes, Azure, etc.)
+ * Endpoint para verificar salud del sistema (usado por Cloud Run, Kubernetes, etc.)
  */
 import type { Request, Response } from 'express';
 import { getRedisClient, isRedisAvailable } from '../../../infra/cache/redisClient';

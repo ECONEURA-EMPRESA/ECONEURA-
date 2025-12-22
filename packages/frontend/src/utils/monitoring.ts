@@ -34,7 +34,7 @@ class Logger {
     // Log en consola solo en desarrollo
     if (import.meta.env.DEV) {
       const emoji = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : type === 'performance' ? '⚡' : 'ℹ️';
-       
+
       console.log(`${emoji} [${type.toUpperCase()}]`, message, metadata || '');
     }
 
@@ -100,8 +100,17 @@ export const logger = new Logger();
  */
 export function monitorResources() {
   if ('performance' in window && 'memory' in performance) {
-    // @ts-ignore
-    const memory = (performance as any).memory;
+    // Chrome-specific memory API extension
+    interface PerformanceWithMemory extends Performance {
+      memory?: {
+        usedJSHeapSize: number;
+        totalJSHeapSize: number;
+        jsHeapSizeLimit: number;
+      };
+    }
+    const memory = (performance as unknown as PerformanceWithMemory).memory;
+
+    if (!memory) return null;
 
     return {
       usedJSHeapSize: memory.usedJSHeapSize,

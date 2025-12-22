@@ -1,3 +1,4 @@
+export type NeuraRole =
   | 'neura-ceo'
   | 'neura-cto'
   | 'neura-cfo'
@@ -26,5 +27,7 @@ export type NeuraDepartment =
   | 'Innovacion';
 
 export type LLMProvider = 'openai' | 'mistral' | 'anthropic' | 'gemini' | 'other';
+
+export type NeuraId = string;
 
 

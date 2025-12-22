@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCRMData, type Period } from '../../../../hooks/useCRMData';
-import { useCRMLeads } from '../../../../hooks/useCRMLeads';
+import { useCRMLeads, type CRMLead } from '../../../../hooks/useCRMLeads';
 import { useDebounce } from '@/utils/debounce';
 // import { sanitizeSearchQuery } from '@/utils/sanitize';
 
@@ -192,10 +192,12 @@ export const CRMDashboard: React.FC<CRMDashboardProps> = ({
                             sortField={sortField}
                             sortDirection={sortDirection}
                             onSort={(field: string) => {
-                                if (sortField === field) {
+                                // Cast string to keyof CRMLead to satisfy TypeScript
+                                const typedField = field as keyof CRMLead;
+                                if (sortField === typedField) {
                                     setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
                                 } else {
-                                    setSortField(field);
+                                    setSortField(typedField);
                                     setSortDirection('desc');
                                 }
                             }}

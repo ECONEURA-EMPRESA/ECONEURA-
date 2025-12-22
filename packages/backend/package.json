@@ -19,6 +19,7 @@
   "dependencies": {
     "@google-cloud/logging-winston": "^6.0.0",
     "@google-cloud/pubsub": "^5.2.0",
+    "@google-cloud/secret-manager": "^6.1.1",
     "@google-cloud/storage": "^7.18.0",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/resources": "^2.2.0",
@@ -39,6 +40,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
+    "firebase-admin": "^13.6.0",
     "helmet": "^8.1.0",
     "ioredis": "^5.8.2",
     "jest": "^30.2.0",
@@ -46,6 +48,7 @@
     "openai": "^6.9.1",
     "pg": "^8.16.3",
     "rate-limit-redis": "^4.3.1",
+    "stripe": "^20.1.0",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.6",
     "tsx": "^4.21.0",

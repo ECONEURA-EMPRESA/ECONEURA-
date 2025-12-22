@@ -1,4 +1,4 @@
-import type { Agent } from '../EconeuraCockpit'
+import type { Agent } from '../types/agent';
 
 interface AgentSelectorProps {
   agents: Agent[]
@@ -19,11 +19,10 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent }: 
           <button
             key={agent.id}
             onClick={() => onSelectAgent(agent)}
-            className={`w-full text-left p-3 rounded-lg transition-all ${
-              selectedAgent?.id === agent.id
+            className={`w-full text-left p-3 rounded-lg transition-all ${selectedAgent?.id === agent.id
                 ? 'bg-blue-600 text-white shadow-lg'
                 : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
-            }`}
+              }`}
           >
             <div className="font-semibold text-sm">{agent.title}</div>
             <div className="text-xs opacity-75 mt-1 line-clamp-2">

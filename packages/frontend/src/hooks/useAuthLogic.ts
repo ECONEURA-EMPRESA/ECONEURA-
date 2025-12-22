@@ -104,7 +104,7 @@ export const useAuthLogic = () => {
         }
     };
 
-    const handleOAuthLogin = (provider: 'google' | 'microsoft') => {
+    const handleOAuthLogin = (provider: 'google') => {
         window.location.href = `${API_URL.replace('/api', '')}/api/auth/${provider}`;
     };
 

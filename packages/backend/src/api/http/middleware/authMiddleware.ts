@@ -1,13 +1,18 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthContext } from '../../../shared/types/auth';
 import { devAuthService } from '../../../identity/application/authServiceStub';
-import { setCorrelationContext } from '../../../shared/logger';
+import { logger, setCorrelationContext } from '../../../shared/logger';
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    authContext?: AuthContext;
+declare global {
+  namespace Express {
+    interface Request {
+      authContext?: AuthContext;
+    }
   }
 }
+
+// ✅ Lazy load para evitar errores si firebase-admin no está configurado en dev
+let firebaseAuthService: any;
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -27,21 +32,38 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
       return;
     }
 
+    // PRODUCTION: Real Firebase Auth
     const authHeader = req.headers['authorization'];
     const token = typeof authHeader === 'string' && authHeader.startsWith('Bearer ')
       ? authHeader.slice('Bearer '.length)
       : '';
 
-    const context = await devAuthService.validateSession(token);
+    let context: AuthContext | null = null;
+
+    if (process.env.NODE_ENV === 'production') {
+      if (!firebaseAuthService) {
+        const mod = await import('../../../identity/application/firebaseAuthService');
+        firebaseAuthService = mod.firebaseAuthService;
+      }
+      context = await firebaseAuthService.validateSession(token);
+    } else {
+      context = await devAuthService.validateSession(token);
+    }
 
     if (!context) {
+      // ✅ SaaS Friendly: Si no hay auth, devolvemos 401 limpio
+      // Excepción: Rutas públicas ya deberían haber sido manejadas antes (server.ts)
       res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
     }
 
     req.authContext = context;
 
-    // Establecer contexto de correlación con tenantId y userId
+    // debug logging en prod
+    if (process.env.NODE_ENV === 'production') {
+      // logger.debug('[AuthMiddleware] Authenticated', { userId: context.userId });
+    }
+
     setCorrelationContext({
       tenantId: context.tenantId,
       userId: context.userId
@@ -50,7 +72,8 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     next();
   } catch (e) {
     const error = e instanceof Error ? e : new Error('Error en authMiddleware');
-    res.status(500).json({ success: false, error: error.message });
+    logger.error('[AuthMiddleware] Error critico', { error: error.message });
+    res.status(500).json({ success: false, error: 'Internal Auth Error' });
   }
 }
 

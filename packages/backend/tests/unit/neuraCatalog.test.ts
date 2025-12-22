@@ -13,7 +13,7 @@ describe('neuraCatalog', () => {
   });
 
   it('debe devolver error si la NEURA no existe', () => {
-    // @ts-expect-error id inválido a propósito para el test
+    // Pasando ID inválido para probar validación en runtime (TS no se queja si es string)
     const result = getNeuraById('neura-no-existe');
 
     expect(result.success).toBe(false);

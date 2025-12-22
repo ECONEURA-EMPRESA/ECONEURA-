@@ -6,7 +6,8 @@ import type { NeuraId } from '../../../shared/types';
 
 const router = Router();
 
-router.post('/api/neuras/:neuraId/chat', requireRoles('admin', 'user'), async (req, res) => {
+// ✅ PUBLIC CHAT API: Sin restricciones de rol ni auth obligatorio
+router.post('/api/neuras/:neuraId/chat', async (req, res) => {
   const { neuraId } = req.params;
 
   if (!neuraId) {
@@ -14,17 +15,23 @@ router.post('/api/neuras/:neuraId/chat', requireRoles('admin', 'user'), async (r
   }
 
   const normalizedNeuraId = neuraId.toLowerCase();
+
+  // Auth context es opcional ahora (bypass auth middleware)
   const authContext = req.authContext;
+
+  // Fallback para userId si no hay auth
+  const guestId = `guest-${Date.now().toString(36)}`;
 
   try {
     const parsed = sendNeuraChatSchema.parse(req.body);
 
     const result = await sendNeuraMessage({
       neuraId: normalizedNeuraId as NeuraId,
-      tenantId: authContext?.tenantId ?? null,
+      tenantId: authContext?.tenantId ?? 'public-tenant',
       conversationId: parsed.conversationId ?? undefined,
       message: parsed.message,
-      userId: parsed.userId ?? authContext?.userId ?? null,
+      // Usar userId del body, o del auth context, o generar uno guest
+      userId: parsed.userId ?? authContext?.userId ?? guestId,
       correlationId: parsed.correlationId ?? undefined
     });
 

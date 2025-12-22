@@ -57,7 +57,7 @@ export async function uploadDocument(
     originalName: file.originalName,
     mimeType: file.mimeType,
     sizeBytes: file.sizeBytes,
-    storageProvider: 'azure-blob',
+    storageProvider: 'google-cloud-storage',
     storagePath,
     status: 'uploaded',
     chunksCount: 0,

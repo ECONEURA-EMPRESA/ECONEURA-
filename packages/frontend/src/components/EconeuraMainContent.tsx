@@ -1,25 +1,10 @@
 import React from 'react';
 import { MessageCircle, Play, Activity } from 'lucide-react';
 
-interface Agent {
-  id: string;
-  title: string;
-  description: string;
-  status: 'active' | 'inactive' | 'error';
-  lastRun?: string;
-}
+import type { Department, Agent } from '../types/agent';
 
 interface EconeuraMainContentProps {
-  activeDept: {
-    id: string;
-    name: string;
-    neura: {
-      title: string;
-      subtitle: string;
-      tags: string[];
-    };
-    agents: Agent[];
-  };
+  activeDept: Department;
   onOpenChat: () => void;
   onExecuteAgent: (agentId: string) => void;
 }
@@ -129,10 +114,10 @@ export function EconeuraMainContent({
                     </h4>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${agent.status === 'active'
-                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                          : agent.status === 'error'
-                            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                            : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        : agent.status === 'error'
+                          ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                          : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400'
                         }`}
                     >
                       {agent.status}

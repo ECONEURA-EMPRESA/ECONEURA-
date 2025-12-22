@@ -2,31 +2,7 @@ import React from 'react';
 import { Crown, Cpu, Shield, Workflow, Users, Target, Brain, Wallet, Database, X } from 'lucide-react';
 import { DepartmentButton } from './DepartmentButton';
 import { getPalette } from '../data/neuraData';
-
-interface Department {
-  id: string;
-  name: string;
-  chips: string[];
-  neura: {
-    title: string;
-    subtitle: string;
-    tags: string[];
-    value: {
-      timeSavedHoursMonth: number;
-      valueEurMonth: number;
-      roiPercentage: number;
-      problem: string;
-      solution: string;
-    };
-  };
-  agents: Array<{
-    id: string;
-    title: string;
-    description: string;
-    status: 'active' | 'inactive' | 'error';
-    lastRun?: string;
-  }>;
-}
+import type { Department } from '../types/agent';
 
 interface EconeuraSidebarProps {
   departments: Department[];

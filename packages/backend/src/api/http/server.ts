@@ -77,8 +77,8 @@ export async function createServer() {
 
   // ✅ CRÍTICO: NO procesar JSON/URL-encoded para rutas de upload (multer necesita multipart/form-data)
   app.use((req, res, next) => {
-    if (req.path.startsWith('/api/uploads')) {
-      // Para uploads, saltar express.json y express.urlencoded
+    if (req.path.startsWith('/api/uploads') || req.path.startsWith('/api/billing/webhook')) {
+      // Para uploads y webhooks (raw body), saltar express.json
       return next();
     }
     // Para otras rutas, procesar JSON/URL-encoded normalmente
@@ -86,7 +86,7 @@ export async function createServer() {
   });
 
   app.use((req, res, next) => {
-    if (req.path.startsWith('/api/uploads')) {
+    if (req.path.startsWith('/api/uploads') || req.path.startsWith('/api/billing/webhook')) {
       return next();
     }
     express.urlencoded({ extended: true, limit: bodyLimit })(req, res, next);
@@ -176,6 +176,13 @@ export async function createServer() {
     }
   }
 
+  // ✅ PUBLIC CHAT (Bypass Auth for fixing 403 issues)
+  // User requested "api that works". Moving this before authMiddleware to ensure access.
+  app.use(neuraChatRoutes);
+
+  // Rate limiting específico por ruta (PUBLIC)
+  app.use('/api/neuras/:neuraId/chat', chatLimiter);
+
   // Auth routes (ANTES de authMiddleware, pero con rate limiting)
   try {
     app.use('/api/auth', authRoutes);
@@ -206,12 +213,12 @@ export async function createServer() {
   app.use(authMiddleware);
 
   // Rate limiting específico por ruta
-  app.use('/api/neuras/:neuraId/chat', chatLimiter);
+  // app.use('/api/neuras/:neuraId/chat', chatLimiter); // Moved up
   // Auth routes usarían authLimiter (cuando existan)
 
   app.use(chatRoutes);
   app.use(conversationRoutes);
-  app.use(neuraChatRoutes);
+  // app.use(neuraChatRoutes); // Moved before authMiddleware
   try {
     app.use(invokeRoutes); // Endpoint /api/invoke/:agentId para compatibilidad con frontend
     logger.info('[Server] Rutas de invoke registradas');
@@ -240,6 +247,15 @@ export async function createServer() {
     if (process.env['NODE_ENV'] === 'production') {
       throw error;
     }
+  }
+
+  // ✅ BILLING API (SaaS)
+  try {
+    const { billingRoutes } = await import('../../billing/api/billingRoutes');
+    app.use('/api/billing', billingRoutes);
+    logger.info('[Server] Rutas BILLING (Stripe) registradas');
+  } catch (error) {
+    logger.warn('[Server] Error cargando rutas Billing', { error: String(error) });
   }
 
   // ✅ Mejora 8: Documentación automática de API

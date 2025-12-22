@@ -8,8 +8,10 @@ import { logger } from './shared/logger';
 // Función async para inicializar el servidor
 async function startServer() {
   try {
-    // Validar variables de entorno
+    // Validar variables de entorno y cargar Secretos si aplica
     // Dynamic import to ensure it runs after dotenv
+    const { loadSecrets } = await import('./config/secrets');
+    await loadSecrets(); // 🔍 Try to fetch secrets from GCP first!
 
     // ✅ DEBUG: Trap unhandled errors to find hidden ioredis/Redis crash
     process.on('uncaughtException', (err) => {
@@ -48,7 +50,7 @@ async function startServer() {
     initializeServices();
 
     // ✅ Initialize Event Listeners (The Nervous System)
-    const { initAutomationListeners } = await import('./automation/listener');
+    const { initAutomationListeners } = await import('./automation/api/events/listener');
     initAutomationListeners();
 
     logger.info('[Startup] Servicios inicializados correctamente');

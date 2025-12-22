@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Changed
 - `docker-compose.yml`: Environment variables instead of hardcoded passwords
 - `scripts/configure-secrets.sh`: Minimal privilege roles
-- `scripts/regenerate_azure_creds.ps1`: Secure credential handling
+- `scripts/check_creds.ps1`: Secure credential handling
 
 #### Security Commits
 - `0fd7761`: Infrastructure and scripts (80%)

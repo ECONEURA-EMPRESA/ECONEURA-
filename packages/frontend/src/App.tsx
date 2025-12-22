@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { LoginView } from './pages/Login/LoginView';
 import { CockpitLayout } from './pages/Cockpit/CockpitLayout';
 import { LoadingSkeleton } from './components/LoadingSkeleton';
+import { PricingPage } from './features/billing/PricingPage';
 
 
 interface User {
@@ -65,6 +66,18 @@ function AppContent() {
                       onLoginSuccess={handleLoginSuccess}
                       onLogout={handleLogout}
                     />
+                  </Suspense>
+                </ErrorBoundary>
+              }
+            />
+
+            {/* ✅ SaaS Billing Page */}
+            <Route
+              path="/pricing"
+              element={
+                <ErrorBoundary>
+                  <Suspense fallback={<LoadingSkeleton />}>
+                    <PricingPage />
                   </Suspense>
                 </ErrorBoundary>
               }

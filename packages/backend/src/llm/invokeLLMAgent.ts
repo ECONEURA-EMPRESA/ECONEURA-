@@ -33,7 +33,7 @@ export interface GenerationResult {
 }
 
 /**
- * Puerto para un cliente LLM concreto (OpenAI, Azure OpenAI, Anthropic, etc.).
+ * Puerto para un cliente LLM concreto (Gemini, Vertex AI, etc.).
  * En esta fase sólo definimos la interfaz hexagonal, el adapter se implementa después.
  */
 /**

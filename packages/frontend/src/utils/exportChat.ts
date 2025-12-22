@@ -1,5 +1,5 @@
 ﻿// Export chat to JSON
-export function exportJSON(messages: Array<{role: string; content: string; timestamp?: string}>, filename: string = 'chat-export.json') {
+export function exportJSON(messages: Array<{ role: string; content: string; timestamp?: string }>, filename: string = 'chat-export.json') {
   const data = {
     exportDate: new Date().toISOString(),
     messagesCount: messages.length,
@@ -10,12 +10,12 @@ export function exportJSON(messages: Array<{role: string; content: string; times
     }))
   };
 
-  const blob = new (window as any).Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   downloadBlob(blob, filename);
 }
 
 // Export chat to CSV
-export function exportCSV(messages: Array<{role: string; content: string; timestamp?: string}>, filename: string = 'chat-export.csv') {
+export function exportCSV(messages: Array<{ role: string; content: string; timestamp?: string }>, filename: string = 'chat-export.csv') {
   const headers = ['Role', 'Content', 'Timestamp'];
   const rows = messages.map(msg => [
     msg.role,
@@ -28,12 +28,12 @@ export function exportCSV(messages: Array<{role: string; content: string; timest
     ...rows.map(row => row.join(','))
   ].join('\n');
 
-  const blob = new (window as any).Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   downloadBlob(blob, filename);
 }
 
 // Export chat to Markdown
-export function exportMarkdown(messages: Array<{role: string; content: string; timestamp?: string}>, filename: string = 'chat-export.md') {
+export function exportMarkdown(messages: Array<{ role: string; content: string; timestamp?: string }>, filename: string = 'chat-export.md') {
   const markdown = [
     '# Chat Export',
     '',
@@ -48,19 +48,18 @@ export function exportMarkdown(messages: Array<{role: string; content: string; t
     })
   ].join('\n');
 
-  const blob = new (window as any).Blob([markdown], { type: 'text/markdown' });
+  const blob = new Blob([markdown], { type: 'text/markdown' });
   downloadBlob(blob, filename);
 }
 
 // Helper function to download blob
-function downloadBlob(blob: any, filename: string) {
-  const url = (window as any).URL.createObjectURL(blob);
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
   link.download = filename;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  (window as any).URL.revokeObjectURL(url);
+  URL.revokeObjectURL(url);
 }
-

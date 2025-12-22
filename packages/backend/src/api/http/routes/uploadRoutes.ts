@@ -195,7 +195,9 @@ router.post(
   // ✅ Agregar autenticación DESPUÉS de procesar el archivo
   authMiddleware,
   requireRoles('admin', 'user'),
-  (req, res) => {
+  authMiddleware,
+  requireRoles('admin', 'user'),
+  async (req, res) => {
     const file = req.file;
 
     // ✅ MEJORA 5: Validación adicional con información de debug

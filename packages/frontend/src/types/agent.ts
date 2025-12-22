@@ -1,58 +1,38 @@
-/**
- * Tipos para el sistema de ejecución de agentes automatizados
- */
+import React from 'react';
 
 export interface Agent {
   id: string;
-  name: string;
-  description: string;
-  capabilities: string[];
-  triggers: string[]; // Palabras clave que activan el agente
-  executionType: 'make' | 'n8n' | 'zapier' | 'custom';
-  webhookUrl?: string;
-  status: 'active' | 'inactive';
-  icon?: string;
-  category: string;
+  title: string;
+  desc: string; // Legacy field, map to description if needed or just keep
+  description?: string; // New field required by UI
+  icon?: React.ElementType | string; // Strict typing
+  role?: 'sales' | 'support' | 'analyst' | 'manager' | 'legal' | 'marketing' | 'innovation';
+  capabilities?: string[];
+  department?: string;
+  status?: 'active' | 'busy' | 'offline' | 'error' | 'inactive';
+  lastRun?: string;
+  model?: string;
+  temperature?: number;
+  pills?: string[];
 }
 
-export interface AgentExecutionRequest {
-  chatContext: string;
-  userIntent: string;
-  suggestedAgents: string[];
-  reasoning: string;
-  confidence: number; // 0-1
+export interface NeuraMetric {
+  title: string;
+  subtitle: string;
+  tags: string[];
+  value?: {
+    timeSavedHoursMonth: number;
+    valueEurMonth: number;
+    roiPercentage: number;
+    problem: string;
+    solution: string;
+  };
 }
 
-export interface AgentExecution {
+export interface Department {
   id: string;
-  agentId: string;
-  agentName: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  startTime: string;
-  endTime?: string;
-  result?: any;
-  error?: string;
-  reasoning: string;
-}
-
-export interface ExecutionResult {
-  success: boolean;
-  data?: any;
-  error?: string;
-  executionTime: number;
-  agentId: string;
-}
-
-export interface AgentExecutionContext {
-  userId: string;
-  chatId: string;
-  messages: ChatMessage[];
-  userIntent: string;
-  suggestedActions: string[];
-}
-
-export interface ChatMessage {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  timestamp?: number;
+  name: string;
+  chips: string[];
+  neura: NeuraMetric;
+  agents: Agent[];
 }

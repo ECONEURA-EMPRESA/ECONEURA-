@@ -58,7 +58,7 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   ]
 };
 
-// Demo users eliminados - usar OAuth Microsoft en producción
+// Demo users eliminados - usar OAuth Google en producción
 // Backend con USE_MOCK_DB=true permite login sin DB real
 const DEMO_USERS: User[] = [
   {
