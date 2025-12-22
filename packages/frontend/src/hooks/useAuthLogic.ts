@@ -47,6 +47,11 @@ export const useAuthLogic = () => {
         setLoading(true);
 
         try {
+            // Safety check for Firebase Init
+            if (!auth || !auth.signInWithEmailAndPassword) {
+                throw new Error('APP_CONFIG_ERROR: Firebase no está configurado. Revisa tu archivo .env');
+            }
+
             let userCredential;
             if (mode === 'login') {
                 userCredential = await signInWithEmailAndPassword(auth, formState.email, formState.password);

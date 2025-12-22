@@ -79,6 +79,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Safety check: If firebase failed to init (missing keys), do not crash app.
+    if (!auth || !auth.onAuthStateChanged) {
+      console.warn('AuthContext: Firebase auth not initialized. Skipping auth listener.');
+      setIsLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         // Recover user data mainly from localStorage if enriched, or construct basic
