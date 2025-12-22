@@ -1,4 +1,5 @@
 import React from 'react';
+import logoImage from '../assets/images/logo-econeura.png';
 
 interface LogoEconeuraProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -43,97 +44,39 @@ export function LogoEconeura({
   return (
     <div className={`inline-flex flex-col items-center justify-center ${className}`}>
       <div className="relative group" style={{ width: dimension, height: dimension }}>
-        {/* Anillos orbitales */}
+        {/* Glow effect back */}
         <div
-          className="absolute rounded-full border border-emerald-400/15 animate-spin"
-          style={{ animationDuration: '20s', inset: -midOffset }}
-        ></div>
-        <div
-          className="absolute rounded-full border border-teal-400/10"
-          style={{ animation: 'spin 15s linear infinite reverse', inset: -outerOffset }}
+          className="absolute inset-0 rounded-full blur-xl opacity-40 group-hover:opacity-60 transition-opacity duration-700 bg-emerald-500"
         ></div>
 
-        {/* Resplandor exterior */}
+        {/* Main Rings */}
         <div
-          className="absolute rounded-full blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700"
-          style={{
-            inset: -glowOffset,
-            background: 'linear-gradient(90deg, rgba(251,191,36,0.25), rgba(14,165,233,0.2), rgba(16,185,129,0.25))'
-          }}
-        ></div>
-
-        {/* Borde circular principal */}
-        <div
-          className="absolute inset-0 rounded-full transition-all duration-500 group-hover:scale-[1.02]"
-          style={{
-            padding: ringPadding,
-            background: ringGradient,
-            backgroundSize: '200% 200%',
-            animation: 'gradient-shift 8s ease infinite',
-            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-            WebkitMaskComposite: 'xor',
-            maskComposite: 'exclude',
-            boxShadow: '0 0 25px rgba(16, 185, 129, 0.4), 0 0 50px rgba(6, 182, 212, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.08)'
-          }}
-        ></div>
-
-        {/* Inner glow */}
-        <div
-          className="absolute rounded-full bg-gradient-to-br from-emerald-400/10 via-teal-400/10 to-cyan-400/10 backdrop-blur-sm"
-          style={{ inset: innerInset }}
-        ></div>
-        <div
-          className="absolute rounded-full bg-gradient-to-tr from-white/8 via-transparent to-transparent"
-          style={{ inset: innerInset }}
-        ></div>
-
-        {/* Imagen circular */}
-        <div
-          className="absolute rounded-full overflow-hidden flex items-center justify-center bg-slate-900/40 backdrop-blur-md"
-          style={{ inset: innerInset }}
+          className="absolute inset-0 rounded-full border-2 border-emerald-500/30"
+          style={{ padding: '2px' }}
         >
-          <img
-            src="/logo-econeura.png"
-            alt="ECONEURA logo"
-            className="w-full h-full object-cover relative z-10"
-            style={{
-              filter: 'drop-shadow(0 4px 12px rgba(16, 185, 129, 0.5))',
-              objectPosition: 'center',
-              transform: 'scale(1.0)', // Reset scale for user provided image
-              transformOrigin: 'center center'
-            }}
-          />
+          <div className="w-full h-full rounded-full border border-teal-400/20"></div>
         </div>
 
-        {/* Brillo superior */}
+        {/* Image Container */}
         <div
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            inset: innerInset,
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.25), transparent 60%)',
-            clipPath: 'ellipse(80% 30% at 50% 20%)'
-          }}
-        ></div>
+          className="absolute inset-2 rounded-full overflow-hidden flex items-center justify-center bg-slate-900 z-10"
+        >
+          <img
+            src={logoImage}
+            alt="ECONEURA logo"
+            className="w-full h-full object-cover"
+          />
+        </div>
       </div>
 
       {showText && (
-        <div className="relative mt-5 text-center">
-          <span
-            className={`absolute top-[2px] left-1/2 -translate-x-1/2 ${textSizeMap[size]} font-black tracking-tight text-slate-500/50 blur-[0.5px]`}
-            style={{ fontFamily: '"Inter","SF Pro Display",system-ui' }}
-            aria-hidden="true"
-          >
-            ECONEURA
-          </span>
+        <div className="relative mt-3 text-center">
           <span
             className={`relative ${textSizeMap[size]} font-black tracking-tight ${darkMode ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent' : 'text-slate-900'
               }`}
             style={{
-              fontFamily: '"Inter","SF Pro Display",system-ui',
+              fontFamily: '"Inter", sans-serif',
               letterSpacing: '-0.03em',
-              textShadow: darkMode
-                ? '0 4px 16px rgba(16,185,129,0.3)'
-                : '0 2px 3px rgba(255,255,255,0.9), 0 3px 8px rgba(0,0,0,0.08)'
             }}
           >
             ECONEURA
