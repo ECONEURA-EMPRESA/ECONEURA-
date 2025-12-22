@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await signOut(auth);
+    await signOut(auth as any); // Cast auth to any to resolve potential implicit any issues if not properly typed in firebase.ts
     setUser(null);
     localStorage.removeItem('econeura_user');
     localStorage.removeItem('econeura_token');

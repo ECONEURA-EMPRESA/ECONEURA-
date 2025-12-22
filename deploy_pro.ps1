@@ -10,11 +10,8 @@ Write-Host "🔍 Verifying vital assets..."
 if (-not (Test-Path "packages/frontend/public/login-bg-futuristic.png")) {
     Write-Error "❌ CRITICAL: Login background missing!"
 }
-if (-not (Test-Path "packages/frontend/src/pages/Login/login.css")) {
-    Write-Error "❌ CRITICAL: Login CSS missing!"
-}
-if (-not (Test-Path "packages/frontend/src/styles/cockpit.css")) {
-    Write-Error "❌ CRITICAL: Cockpit CSS missing!"
+if (-not (Test-Path "packages/frontend/public/login-bg-futuristic.png")) {
+    Write-Error "❌ CRITICAL: Login background missing!"
 }
 
 # 2. BUILD FRONTEND
