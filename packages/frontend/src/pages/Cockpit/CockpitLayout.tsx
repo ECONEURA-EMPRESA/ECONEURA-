@@ -5,6 +5,7 @@ import { EconeuraMainContent } from '../../components/EconeuraMainContent';
 import { NEURA_DATA as departments } from '../../data/neuraData';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import '../../styles/cockpit.css';
 
 interface CockpitLayoutProps {
     user?: {
@@ -34,7 +35,7 @@ export const CockpitLayout: React.FC<CockpitLayoutProps> = () => {
     };
 
     return (
-        <div className="flex h-screen bg-neutral-950 text-white overflow-hidden">
+        <div className="flex h-screen cockpitContainer text-white overflow-hidden">
             <EconeuraSidebar
                 departments={departments}
                 activeDept={activeDeptId}
