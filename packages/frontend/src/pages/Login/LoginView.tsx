@@ -140,13 +140,32 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     </div>
                 </div>
 
-                {/* Error message */}
+                {/* Error message handling */}
                 {error && (
                     <div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-2xl text-red-200 text-sm backdrop-blur-xl animate-shake">
-                        <p className="font-bold">Error de Acceso:</p>
-                        {error}
-                        <br />
-                        <span className="text-xs opacity-70 block mt-2">ID incidente: {Math.floor(Math.random() * 1000)}</span>
+                        <p className="font-bold flex items-center gap-2">
+                            ⚠️ Error de Configuración
+                        </p>
+
+                        {error.includes('auth/configuration-not-found') ? (
+                            <div className="mt-2">
+                                <p>El inicio de sesión con Email/Contraseña está desactivado en Firebase.</p>
+                                <a
+                                    href={`https://console.firebase.google.com/project/${import.meta.env.VITE_FIREBASE_PROJECT_ID}/authentication/providers`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mt-3 inline-block w-full text-center py-2 px-4 bg-white text-red-600 font-bold rounded-lg hover:bg-gray-100 transition-colors"
+                                >
+                                    👉 ACTIVAR AHORA
+                                </a>
+                                <p className="mt-2 text-xs opacity-75">Haz clic, activa "Email/Password" y vuelve aquí.</p>
+                            </div>
+                        ) : (
+                            <>
+                                <p>{error}</p>
+                                <span className="text-xs opacity-70 block mt-2">ID incidente: {Math.floor(Math.random() * 1000)}</span>
+                            </>
+                        )}
                     </div>
                 )}
 
