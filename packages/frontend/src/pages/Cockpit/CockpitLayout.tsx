@@ -5,7 +5,6 @@ import { EconeuraMainContent } from '../../components/EconeuraMainContent';
 import { NEURA_DATA as departments } from '../../data/neuraData';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 
 interface CockpitLayoutProps {
     user?: {
