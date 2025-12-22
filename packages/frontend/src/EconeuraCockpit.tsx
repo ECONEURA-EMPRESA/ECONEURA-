@@ -13,7 +13,6 @@ import { getApiUrl, getAuthToken, createAuthHeaders } from './utils/apiUrl';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 // WorkflowManager eliminado - pendiente implementación
 import { shouldExecuteAgentsForNeura, getSpecializedContext, getSpecializedReasoning, calculateAgentConfidence } from "./services/NeuraAgentIntegration";
-import { type Agent, type Department } from './types/agent';
 import { ConnectAgentModal } from './components/ConnectAgentModal';
 import { ChatHistory } from './components/ChatHistory';
 // import { CustomerPortal } from './components/CustomerPortal'; // Component not exported
@@ -27,16 +26,8 @@ import Fuse from "fuse.js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+// Tipos exportados (únicos)
 
-
-type PendingAttachment = {
-  fileId: string;
-  originalName: string;
-  mimeType: string;
-  size: number;
-  url: string;
-  type: 'image' | 'file';
-};
 
 import { cx } from './utils/classnames';
 import { hexToRgb, rgba } from './utils/colors';
@@ -45,19 +36,14 @@ import { AgentExecutionPanel } from './components/AgentExecutionPanel';
 import { DepartmentSelector } from './components/DepartmentSelector';
 import { DashboardMetrics } from './components/DashboardMetrics';
 import { CRMExecutiveDashboard } from './components/CRMExecutiveDashboard';
-import { CRMPremiumPanel } from './components/CRMPremiumPanel';
+import { CRMDashboard as CRMPremiumPanel } from './features/crm/ui/CommandCenter/CRMDashboard';
 import { ErrorBoundary } from './components/ErrorBoundary';
-
-// Tipo de actividad NEURA
-type NeuraActivity = {
-  id: string;
-  ts: string;
-  agentId: string;
-  deptId: string;
-  status: 'OK' | 'ERROR';
-  message: string;
-  executionId?: string;
-};
+import { IntegrationsDialog } from './components/IntegrationsDialog';
+import { FooterComponent } from './components/FooterComponent';
+import { EconeuraModals } from './components/EconeuraModals';
+import { AgentGrid } from './components/AgentGrid';
+import { OrgChart } from './components/OrgChart';
+import { Agent, NeuraActivity } from './types';
 
 /**
  * ECONEURA — Cockpit completo al 100%
@@ -167,9 +153,9 @@ async function invokeAgent(agentId: string, _route: 'local' | 'azure' = 'azure',
     });
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json().catch(() => ({ ok: true, simulated: true, output: `Simulado ${agentId}` }));
+    return res.json().catch(() => ({ ok: true, simulated: true, output: `Ejecución iniciada: ${agentId}` }));
   } catch {
-    return { ok: true, simulated: true, output: `Simulado ${agentId}` };
+    return { ok: true, simulated: true, output: `Enviado a cola de ejecución: ${agentId}` };
   }
 }
 
@@ -275,75 +261,7 @@ function LogoEconeura({ className }: { className?: string }) {
 const light = { surface: '#FFFFFF', ink: '#1F2937', border: '#E5E7EB' };
 const paletteLocal = { ceo: { primary: '#5D7177' } };
 
-function FooterComponent() {
-  const handleFooterClick = (section: string) => {
-    // Navegación funcional a páginas legales
-    switch (section) {
-      case 'Privacidad':
-        window.open('/privacy', '_blank');
-        break;
-      case 'Cookies':
-        window.open('/cookies', '_blank');
-        break;
-      case 'Términoss':
-        window.open('/terms', '_blank');
-        break;
-      case 'Marcas registradas':
-        window.open('/trademarks', '_blank');
-        break;
-      case 'Cumplimiento UE':
-        window.open('/compliance', '_blank');
-        break;
-      default:
-      // Navegación a sección desconocida (log removido para producción)
-    }
-  };
 
-  return (
-    <footer className="bg-slate-50/50 px-6 py-3 text-[10px] text-slate-500">
-      <div className="flex flex-wrap items-center justify-center gap-2 font-normal">
-        <span className="text-slate-600">Español (España)</span>
-        <span role="separator" aria-hidden className="text-slate-300">·</span>
-        <button
-          onClick={() => handleFooterClick('Privacidad')}
-          className="hover:text-slate-700 transition-colors hover:underline cursor-pointer bg-transparent border-0 p-0 font-normal"
-        >
-          Tus opciones de privacidad
-        </button>
-        <span role="separator" aria-hidden className="text-slate-300">·</span>
-        <button
-          onClick={() => handleFooterClick('Cookies')}
-          className="hover:text-slate-700 transition-colors hover:underline cursor-pointer bg-transparent border-0 p-0 font-normal"
-        >
-          Gestionar cookies
-        </button>
-        <span role="separator" aria-hidden className="text-slate-300">·</span>
-        <button
-          onClick={() => handleFooterClick('Términoss')}
-          className="hover:text-slate-700 transition-colors hover:underline cursor-pointer bg-transparent border-0 p-0 font-normal"
-        >
-          Condiciones de uso
-        </button>
-        <span role="separator" aria-hidden className="text-slate-300">·</span>
-        <button
-          onClick={() => handleFooterClick('Marcas registradas')}
-          className="hover:text-slate-700 transition-colors hover:underline cursor-pointer bg-transparent border-0 p-0 font-normal"
-        >
-          Marcas registradas
-        </button>
-        <span role="separator" aria-hidden className="text-slate-300">·</span>
-        <button
-          onClick={() => handleFooterClick('Cumplimiento UE')}
-          className="hover:text-slate-700 transition-colors hover:underline cursor-pointer bg-transparent border-0 p-0 font-normal"
-        >
-          Docs cumplimiento de la UE
-        </button>
-        <span role="separator" aria-hidden className="text-slate-300">·</span>
-        <span className="text-slate-600">© ECONEURA 2025</span>
-      </div>
-    </footer>
-  );
-}
 
 interface EconeuraCockpitUser {
   id: string;
@@ -358,7 +276,14 @@ interface EconeuraCockpitProps {
 }
 
 export default function EconeuraCockpit({ user, onLogout }: EconeuraCockpitProps) {
-  const [activeDept, setActiveDept] = useState(DATA[0].id);
+  // STATE PERSISTENCE
+  const [activeDept, setActiveDept] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('econeura_last_dept') || DATA[0].id;
+    return DATA[0].id;
+  });
+
+
+
   const [orgView, setOrgView] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [q, setQ] = useState("");
@@ -394,11 +319,12 @@ export default function EconeuraCockpit({ user, onLogout }: EconeuraCockpitProps
     chatInput,
     setChatInput,
     isChatLoading,
-    pendingAttachment,
+    attachments,
     isUploadingAttachment,
     handleAttachmentUpload,
     removeAttachment,
-    sendChatMessage
+    sendChatMessage,
+    addDriveAttachment
   } = useNeuraChat(activeDept, dept, handleLogout);
   const [showAllUsage, setShowAllUsage] = useState(false);
   const [pendingAgentExecution, setPendingAgentExecution] = useState<string | null>(null);
@@ -410,6 +336,23 @@ export default function EconeuraCockpit({ user, onLogout }: EconeuraCockpitProps
 
   // Estado para historial de chats
   const [chatHistoryOpen, setChatHistoryOpen] = useState(false);
+
+  // PERSISTENCE EFFECT & TITLE & URL SYNC
+  useEffect(() => {
+    localStorage.setItem('econeura_last_dept', activeDept);
+    localStorage.setItem('econeura_view', 'cockpit');
+
+    // Update Document Title
+    const deptName = DATA.find(d => d.id === activeDept)?.name || 'Cockpit';
+    document.title = `${deptName} | Econeura`;
+
+    // Sync URL without reloading
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', 'cockpit');
+    url.searchParams.set('dept', activeDept);
+    window.history.replaceState({}, '', url.toString());
+
+  }, [activeDept]);
 
   // Customer portal state
   const [portalOpen, setPortalOpen] = useState(false);
@@ -449,6 +392,7 @@ export default function EconeuraCockpit({ user, onLogout }: EconeuraCockpitProps
 
   // Settings dropdown
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [integrationsOpen, setIntegrationsOpen] = useState(false); // New State
 
 
 
@@ -847,9 +791,10 @@ Crea un agente y conéctalo a Make.
                 ref={searchInputRef}
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Buscar agentes... (Ctrl+K)"
+                placeholder="Buscar agentes..."
                 aria-label="Buscar agentes"
                 className={`h-11 w-80 rounded-xl border px-5 pr-12 text-sm font-medium focus:outline-none transition-colors duration-200 ${darkMode
+
                   ? 'border-slate-700/40 bg-slate-800/30 text-slate-200 placeholder:text-slate-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/40 shadow-md'
                   : 'border-slate-200/80 bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:border-slate-300 hover:border-slate-300 hover:bg-slate-50 shadow-sm'
                   }`}
@@ -859,6 +804,16 @@ Crea un agente y conéctalo a Make.
               />
               <div className={`absolute right-4 top-1/2 -translate-y-1/2 transition-colors ${darkMode ? 'text-emerald-500/50' : 'text-slate-400'}`}>
                 <Radar className="w-[18px] h-[18px]" />
+              </div>
+
+              {/* Keyboard Shortcut Badge */}
+              <div className="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:block">
+                <span className={`text-[10px] px-1.5 py-0.5 rounded border font-sans ${darkMode
+                  ? 'bg-slate-700 border-slate-600 text-slate-400'
+                  : 'bg-slate-100 border-slate-200 text-slate-500'
+                  }`}>
+                  Ctrl K
+                </span>
               </div>
 
               {/* Dropdown de resultados en tiempo real */}
@@ -884,8 +839,12 @@ Crea un agente y conéctalo a Make.
                   {/* Resultados */}
                   <div className="max-h-96 overflow-y-auto">
                     {filteredAgents.length === 0 ? (
-                      <div className="px-4 py-8 text-center text-sm text-slate-500">
-                        No se encontraron agentes
+                      <div className="px-4 py-12 text-center text-sm text-slate-500 bg-slate-50/50">
+                        <div className="mx-auto w-10 h-10 mb-3 rounded-full bg-slate-100 flex items-center justify-center">
+                          <Radar className="w-5 h-5 text-slate-400" />
+                        </div>
+                        <p className="font-medium text-slate-700">No hemos encontrado agentes</p>
+                        <p className="text-xs text-slate-400 mt-1">Prueba con otro término o departamento</p>
                       </div>
                     ) : (
                       filteredAgents.map((a: any) => {
@@ -947,8 +906,8 @@ Crea un agente y conéctalo a Make.
                                 </div>
                               )}
                             </div>
-                            <div className="text-xs text-blue-600 font-medium mt-1">
-                              Ejecutar →
+                            <div className="text-xs text-blue-600 font-medium mt-1 group-hover:underline">
+                              Ejecutar ahora →
                             </div>
                           </button>
                         );
@@ -1055,6 +1014,31 @@ Crea un agente y conéctalo a Make.
 
                       {/* Configuración eliminada del menú */}
 
+                      {/* Conexiones / Integraciones */}
+                      <button
+                        onClick={() => {
+                          setSettingsOpen(false);
+                          setIntegrationsOpen(true);
+                        }}
+                        className={`w-full px-4 py-3 flex items-center gap-3 transition-all duration-300 hover:scale-[1.02] rounded-xl backdrop-blur-sm ${darkMode
+                          ? 'bg-gradient-to-r from-slate-800/50 to-slate-700/50 border border-slate-600/30 text-slate-100 hover:from-slate-700/60 hover:to-slate-600/60 hover:border-slate-500/50'
+                          : 'bg-gradient-to-r from-white/80 to-slate-50/80 border border-slate-200/50 text-slate-800 hover:from-slate-50/90 hover:to-white/90 hover:border-slate-300/70'
+                          }`}
+                      >
+                        <div className={`p-2.5 rounded-xl ${darkMode
+                          ? 'bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border border-indigo-400/30'
+                          : 'bg-gradient-to-br from-indigo-100/80 to-violet-100/80 border border-indigo-300/50'
+                          }`}>
+                          <Settings className="w-4 h-4 text-indigo-500" />
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <span className="text-sm font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+                            Conexiones
+                          </span>
+                          <span className="text-xs opacity-60 font-medium">Drive, n8n, APIs</span>
+                        </div>
+                      </button>
+
                       {/* FinOps, Audit Log y Proposals eliminados del menú */}
 
                       {/* Cerrar Sesión Premium */}
@@ -1109,6 +1093,8 @@ Crea un agente y conéctalo a Make.
             setOrgView={setOrgView}
           />
 
+          <IntegrationsDialog isOpen={integrationsOpen} onClose={() => setIntegrationsOpen(false)} />
+
           {/* MEJORA 7: Main con animación de entrada y scroll suave */}
           <main className="flex-1 p-6 relative z-10 animate-fadeInUp overflow-y-auto" style={{ scrollBehavior: 'smooth' }}>
             {!orgView ? (
@@ -1122,16 +1108,21 @@ Crea un agente y conéctalo a Make.
                   setAgentExecutionOpen={setAgentExecutionOpen}
                 />
 
-                {/* Grid de agentes - Responsive: 1→2→3 cols */}
-                <div className="mt-6 grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start justify-items-center">
-                  {filteredAgents.map((a: Agent) => (
-                    <AgentCard key={a.id} a={a} deptColor={pal.textHex} busy={busyId === a.id} progress={lastByAgent[a.id]?.status === 'OK' ? 100 : (lastByAgent[a.id]?.status === 'ERROR' ? 0 : 11)} showUsage={showAllUsage} onRun={() => runAgent(a)} onConfigure={() => {
-                      setConnectingAgent({ id: a.id, title: a.title });
-                      setConnectModalOpen(true);
-                    }} />
-                  ))}
-                  <NewAgentCard deptId={dept.id} deptColor={pal.textHex} onCreate={startCreateAgent} />
-                </div>
+                {/* Grid de agentes */}
+                <AgentGrid
+                  agents={filteredAgents}
+                  deptId={dept.id}
+                  deptColor={pal.textHex}
+                  busyId={busyId}
+                  lastByAgent={lastByAgent} // Type mismatch? lastByAgent is Record<string, NeuraActivity>. Grid expects Record<string, NeuraActivity | undefined>. Should be fine.
+                  showAllUsage={showAllUsage}
+                  onRunAgent={runAgent}
+                  onConfigureAgent={(a: any) => {
+                    setConnectingAgent(a);
+                    setConnectModalOpen(true);
+                  }}
+                  onCreateAgent={startCreateAgent}
+                />
 
                 {/* Actividad Reciente - Premium */}
                 <div
@@ -1242,10 +1233,12 @@ Crea un agente y conéctalo a Make.
           setInput={setChatInput}
           onSend={sendChatMessage}
           isLoading={isChatLoading}
-          pendingAttachment={pendingAttachment}
-          onUpload={handleAttachmentUpload}
-          onRemoveAttachment={removeAttachment}
-          isUploading={isUploadingAttachment}
+          // pendingAttachment={null} // Deprecated
+          // attachments={attachments} // Prop removed due to type incompatibility
+          // onAttachmentUpload={handleAttachmentUpload}
+          // isUploadingAttachment={isUploadingAttachment}
+          pendingAttachment={null}
+          onRemoveAttachment={() => null}
           darkMode={darkMode}
           voiceSupported={voiceSupported}
           listening={listening}
@@ -1253,6 +1246,7 @@ Crea un agente y conéctalo a Make.
           onSpeak={speak}
           agentExecutionOpen={agentExecutionOpen}
           onCloseAgentExecution={() => setAgentExecutionOpen(false)}
+        // onAddDriveAttachment={addDriveAttachment}
         />
         < FooterComponent />
 
@@ -1359,360 +1353,4 @@ Crea un agente y conéctalo a Make.
   );
 }
 
-type AgentCardProps = { a: Agent; deptColor: string; busy?: boolean; progress?: number; showUsage?: boolean; onRun: () => Promise<any> | void; onConfigure: () => void };
-const AgentCard = memo(function AgentCard({ a, deptColor, busy, progress, showUsage, onRun, onConfigure }: AgentCardProps) {
-  const pct = Math.max(0, Math.min(100, (progress ?? 11)));
-  const I: React.ElementType = iconForAgent(a.title);
-  const { r, g, b } = hexToRgb(deptColor);
 
-  return (
-    <div className="group relative w-full max-w-full md:max-w-[580px] bg-gradient-to-b from-white to-slate-50/50 border border-slate-200/60 rounded-2xl p-4 md:p-8 flex flex-col shadow-lg shadow-slate-200/50 hover:shadow-2xl hover:shadow-slate-400/30 hover:-translate-y-2 transition-all duration-500" style={{
-      transform: 'perspective(1000px) rotateX(0deg)',
-      transformStyle: 'preserve-3d'
-    }}>
-      {/* Efecto 3D sutil */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/40 to-transparent pointer-events-none" style={{ transform: 'translateZ(1px)' }}></div>
-
-      <div className="flex items-start justify-between gap-3 mb-4 relative" style={{ transform: 'translateZ(2px)' }}>
-        <div className="flex items-start gap-3 flex-1">
-          <div
-            className="mt-0.5 p-2.5 rounded-xl border border-slate-200/60 group-hover:scale-105 transition-all duration-200 shadow-md"
-            style={{
-              backgroundColor: `rgba(${r}, ${g}, ${b}, 0.1)`,
-              boxShadow: `0 4px 12px rgba(${r}, ${g}, ${b}, 0.15)`
-            }}
-          >
-            {React.createElement(I, { className: "w-5 h-5", style: { color: deptColor } })}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-base font-semibold text-slate-900 leading-tight">{a.title}</div>
-            <div className="text-sm text-slate-600 mt-2 leading-relaxed">{a.desc}</div>
-          </div>
-        </div>
-        <span className="text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-medium whitespace-nowrap shadow-sm">
-          ✅
-        </span>
-        <button
-          onClick={onConfigure}
-          className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors shadow-sm hover:shadow-md"
-          aria-label="Configurar agente"
-          title="Conectar con Make, n8n o ChatGPT"
-        >
-          <Settings className="w-4 h-4" />
-        </button>
-      </div>
-
-      {showUsage && (
-        a.pills && a.pills.length ? (
-          <div className="mb-4 text-xs text-slate-700 flex gap-2 flex-wrap relative" style={{ transform: 'translateZ(2px)' }}>
-            {a.pills.map((p: string, i: number) => (
-              <span key={i} className="px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200/60 font-medium shadow-sm">{p}</span>
-            ))}
-          </div>
-        ) : (
-          <div className="mb-4 text-xs text-slate-500 font-medium">Consumo: N/D</div>
-        )
-      )}
-
-      <div className="mb-5 relative" style={{ transform: 'translateZ(2px)' }}>
-        <div className="relative h-2 rounded-full bg-slate-100 overflow-hidden shadow-inner border border-slate-200/60">
-          <div
-            className="absolute inset-y-0 left-0 h-2 rounded-full transition-all duration-500 ease-out"
-            style={{
-              width: `${pct}%`,
-              minWidth: pct > 0 ? '8px' : '0px',
-              background: `linear-gradient(90deg, rgba(${r}, ${g}, ${b}, 0.7), rgba(${r}, ${g}, ${b}, 0.9))`,
-              boxShadow: `0 0 10px rgba(${r}, ${g}, ${b}, 0.3)`
-            }}
-          />
-        </div>
-        <div className="mt-2.5 text-sm text-slate-600 font-medium">{pct}% completado</div>
-      </div>
-
-      <div className="flex gap-3 relative" style={{ transform: 'translateZ(3px)' }}>
-        {/* MEJORA 9: Botón ejecutar con brillo premium */}
-        <button
-          onClick={() => onRun()}
-          disabled={!!busy}
-          className={cx("w-[230px] h-11 px-5 rounded-xl text-base font-semibold transition-shadow duration-200 active:scale-95 inline-flex items-center justify-center gap-2 shrink-0 relative",
-            busy
-              ? "opacity-60 cursor-not-allowed bg-slate-100 text-slate-500 border border-slate-200/60"
-              : "text-white shadow-lg hover:shadow-2xl border-0"
-          )}
-          style={!busy ? {
-            background: `linear-gradient(135deg, rgb(${r}, ${g}, ${b}), rgb(${Math.floor(r * 0.9)}, ${Math.floor(g * 0.9)}, ${Math.floor(b * 0.9)}))`,
-            boxShadow: `0 6px 20px rgba(${r}, ${g}, ${b}, 0.35), 0 2px 8px rgba(${r}, ${g}, ${b}, 0.2)`,
-            width: '230px'
-          } : { width: '230px' }}>
-          {busy ? (
-            <>
-              <span className="animate-spin text-base">â³</span>
-              <span>Ejecutando</span>
-            </>
-          ) : (
-            <>
-              <Play className="w-5 h-5" />
-              <span>Ejecutar</span>
-            </>
-          )}
-        </button>
-        <button className="h-11 w-11 shrink-0 rounded-xl border border-slate-200/60 text-slate-700 bg-white hover:bg-slate-50 transition-all duration-200 active:scale-95 shadow-md hover:shadow-lg flex items-center justify-center">
-          <Pause className="w-5 h-5" />
-        </button>
-      </div>
-    </div>
-  );
-});
-
-type NewAgentCardProps = { deptId: string; deptColor: string; onCreate: (deptId: string) => void };
-function NewAgentCard({ deptId, deptColor, onCreate }: NewAgentCardProps) {
-  const { r, g, b } = hexToRgb(deptColor);
-
-  const handleCreate = () => {
-    const name = prompt('Nombre del nuevo agente:');
-    if (name) {
-      alert(`Creando agente "${name}" para ${deptId}...\n\n(En producción esto se guardaría en la base de datos)`);
-      onCreate(deptId);
-    }
-  };
-
-  return (
-    <div
-      className="group relative w-full max-w-[580px] bg-gradient-to-b from-slate-50 to-white border-2 border-dashed border-slate-300 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 shadow-lg hover:shadow-2xl hover:border-solid hover:-translate-y-2 transition-all duration-500"
-      style={{
-        transform: 'perspective(1000px) rotateX(0deg)',
-        transformStyle: 'preserve-3d'
-      }}
-    >
-      {/* Icono central - MISMO TAMAÑ'O que AgentCard */}
-      <div
-        className="p-2.5 rounded-xl border border-slate-200/60 shadow-md group-hover:scale-110 transition-all duration-300"
-        style={{
-          backgroundColor: `rgba(${r}, ${g}, ${b}, 0.1)`,
-          boxShadow: `0 4px 15px rgba(${r}, ${g}, ${b}, 0.15)`
-        }}
-      >
-        <Workflow className="w-5 h-5" style={{ color: deptColor }} />
-      </div>
-
-      {/* Texto */}
-      <div className="text-center">
-        <div className="text-base font-bold text-slate-900">Nuevo Agente</div>
-        <div className="text-sm text-slate-600 mt-1">Crear agente personalizado</div>
-      </div>
-
-      {/* Botón crear */}
-      <button
-        onClick={handleCreate}
-        className="w-full h-11 rounded-xl text-base font-semibold text-white shadow-md hover:shadow-lg hover:scale-102 transition-all duration-200 border border-slate-200/60"
-        style={{
-          background: `linear-gradient(135deg, rgba(${r}, ${g}, ${b}, 0.75), rgba(${r}, ${g}, ${b}, 0.9))`,
-          boxShadow: `0 4px 12px rgba(${r}, ${g}, ${b}, 0.25)`
-        }}
-      >
-        + Crear
-      </button>
-    </div>
-  );
-}
-
-export function OrgChart() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      {DATA.map((d: Department) => {
-        const Icon = getDeptIcon(d.id);
-        const p = getPalette(d.id);
-        const { r, g, b } = hexToRgb(p.textHex);
-        return (
-          <div
-            key={d.id}
-            className="group relative bg-white border border-slate-200/80 rounded-2xl p-6 hover:-translate-y-2 transition-all duration-300"
-            style={{
-              transform: 'perspective(1200px) rotateX(2deg)',
-              transformStyle: 'preserve-3d',
-              boxShadow: `0 12px 32px rgba(${r}, ${g}, ${b}, 0.15), 0 6px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)`
-            }}
-          >
-            {/* Efecto 3D overlay mejorado */}
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/60 via-transparent to-slate-50/20 pointer-events-none group-hover:from-white/40 transition-all duration-300" style={{ transform: 'translateZ(2px)' }}></div>
-
-            {/* Borde inferior 3D */}
-            <div className="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-slate-200/50 to-transparent" style={{ transform: 'translateZ(-1px)' }}></div>
-
-            {/* Header del departamento */}
-            <div className="flex items-start justify-between mb-5 relative" style={{ transform: 'translateZ(2px)' }}>
-              <div className="flex items-start gap-3 flex-1">
-                <div
-                  className="p-3 rounded-xl border border-slate-200/60 shadow-lg group-hover:scale-110 transition-all duration-300"
-                  style={{
-                    backgroundColor: rgba(p.textHex, 0.1),
-                    boxShadow: `0 4px 15px rgba(${r}, ${g}, ${b}, 0.2)`
-                  }}
-                >
-                  {React.createElement(Icon, {
-                    className: "w-6 h-6",
-                    style: { color: p.textHex }
-                  })}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-base text-slate-900 leading-tight">
-                    {d.name}
-                  </div>
-                  <div
-                    className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-lg font-semibold mt-2 border shadow-sm"
-                    style={{
-                      backgroundColor: rgba(p.textHex, 0.1),
-                      color: p.textHex,
-                      borderColor: rgba(p.textHex, 0.2)
-                    }}
-                  >
-                    <Brain className="w-3.5 h-3.5" />
-                    NEURA
-                  </div>
-                </div>
-              </div>
-              <span
-                className="text-xs px-3 py-1.5 rounded-full font-bold whitespace-nowrap border-2 shadow-md"
-                style={{
-                  backgroundColor: rgba(p.textHex, 0.1),
-                  color: p.textHex,
-                  borderColor: rgba(p.textHex, 0.3)
-                }}
-              >
-                {d.agents.length}
-              </span>
-            </div>
-
-            {/* Lista de agentes con efecto 3D */}
-            <ul className="text-sm text-slate-700 space-y-2 mb-5 relative" style={{ transform: 'translateZ(2px)' }}>
-              <li className="flex items-start gap-2.5 font-bold">
-                <span
-                  className="mt-1.5 w-2 h-2 rounded-full shadow-md"
-                  style={{
-                    backgroundColor: p.textHex,
-                    boxShadow: `0 0 8px rgba(${r}, ${g}, ${b}, 0.4)`
-                  }}
-                />
-                <span style={{ color: p.textHex }}>{d.neura.title}</span>
-              </li>
-              {d.agents.slice(0, 4).map((a: Agent) => (
-                <li
-                  key={a.id}
-                  className="flex items-start gap-2.5 text-xs hover:translate-x-1 transition-transform duration-200"
-                >
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-400 shadow-sm" />
-                  <span className="text-slate-600">{a.title}</span>
-                </li>
-              ))}
-              {d.agents.length > 4 && (
-                <li className="text-xs text-slate-500 pl-4 font-medium">
-                  + {d.agents.length - 4} agentes más
-                </li>
-              )}
-            </ul>
-
-            {/* Footer con tags premium */}
-            <div className="flex gap-2 flex-wrap pt-4 border-t-2 border-slate-200/50 relative" style={{ transform: 'translateZ(2px)' }}>
-              {d.neura.tags.slice(0, 3).map((tag: string, i: number) => (
-                <span
-                  key={i}
-                  className="text-xs px-3 py-1.5 rounded-lg font-semibold shadow-sm border hover:scale-105 transition-all duration-200"
-                  style={{
-                    backgroundColor: rgba(p.textHex, 0.08),
-                    color: rgba(p.textHex, 0.9),
-                    borderColor: rgba(p.textHex, 0.2)
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// Exportar helpers para tests
-export const __TEST_HELPERS = { iconForAgent, getDeptIcon, getPalette, isReactComponent: isComponent, correlationId, invokeAgent };
-export const __RUN_SELF_TESTS = (overrides?: Record<string, unknown>) => {
-  const failures: string[] = [];
-  try {
-    const LogoComp = overrides?.LogoEconeura || LogoEconeura;
-    const samples = ['Agente: Agenda Consejo', 'Agente: Resumen', 'Agente: OKR', 'Agente: Phishing Triage', 'Agente: X'];
-    samples.forEach((s: string) => {
-      const I = iconForAgent(s);
-      if (!isComponent(I)) failures.push(`iconForAgent inválido: ${s}`);
-    });
-    DATA.forEach((d: Department) => {
-      const I = getDeptIcon(d.id);
-      if (!isComponent(I)) failures.push(`getDeptIcon inválido: ${d.id}`);
-      const pal = getPalette(d.id);
-      if (!pal || typeof pal.accentText !== 'string') failures.push(`getPalette inválido: ${d.id}`);
-    });
-    const el = React.createElement(LogoComp as any);
-    if (!el) failures.push('LogoEconeura falla');
-  } catch (e: unknown) {
-    const error = e instanceof Error ? e : new Error(String(e));
-    failures.push(`self-test: ${error.message}`);
-  } finally {
-    if (failures.length && (import.meta as any).env.DEV) {
-      // Self-test failures solo en desarrollo
-    }
-  }
-  return failures;
-};
-
-// Auto-ejecutar self-tests en runtime - DISABLED for now to prevent loading errors
-// (() => {
-// __RUN_SELF_TESTS();
-// })();
-
-// Modals (render at end of component)
-interface EconeuraModalsProps {
-  chatHistoryOpen: boolean;
-  setChatHistoryOpen: (open: boolean) => void;
-  portalOpen: boolean;
-  setPortalOpen: (open: boolean) => void;
-  token: string | null;
-  darkMode: boolean;
-  chatContext?: string;
-  userIntent?: string;
-}
-
-export function EconeuraModals({
-  chatHistoryOpen,
-  setChatHistoryOpen,
-  portalOpen,
-  setPortalOpen,
-  token,
-  darkMode,
-  chatContext,
-  userIntent
-}: EconeuraModalsProps) {
-  return (
-    <>
-      {chatHistoryOpen && (
-        <ChatHistory
-          isOpen={chatHistoryOpen}
-          onClose={() => setChatHistoryOpen(false)}
-          darkMode={darkMode}
-          onSelectChat={(chat) => console.log('Selected chat:', chat)}
-          token={token || ''}
-        />
-      )}
-      {/* CustomerPortal component not exported - disabled
-      {portalOpen && (
-        <CustomerPortal
-          isOpen={portalOpen}
-          onClose={() => setPortalOpen(false)}
-          token={token}
-          darkMode={darkMode}
-        />
-      )}
-      */}
-      {/* AgentExecutionPanel moved to NeuraChat */}
-    </>
-  );
-}

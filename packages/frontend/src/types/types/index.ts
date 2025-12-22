@@ -15,15 +15,13 @@ export interface Department {
   chips: string[];
   neura: {
     title: string;
-    model?: string;
-    desc?: string;
+    model: string;
+    desc: string;
     tags: string[];
-    value?: {
+    value: {
       timeSavedHoursMonth: number;
-      tokensUsedMonth?: number;
-      costMonth?: number;
-      valueEurMonth?: number;
-      roiPercentage?: number;
+      tokensUsedMonth: number;
+      costMonth: number;
       problem: string;
       solution: string;
     };

@@ -9,7 +9,7 @@ interface CockpitLayoutProps {
         email: string;
         name: string;
         tenantId?: string;
-    } | null;
+    };
     onLogout?: () => void;
 }
 
@@ -47,5 +47,5 @@ export const CockpitLayout: React.FC<CockpitLayoutProps> = ({ user, onLogout }) 
     // NOTA: Actualmente reutilizamos el componente EconeuraCockpit existente
     // En el futuro, podemos refactorizar esto en componentes más pequeños
     // y usar los datos de useCockpitData para cargar dinámicamente
-    return <EconeuraCockpit user={user ?? undefined} onLogout={onLogout} />;
+    return <EconeuraCockpit user={user} onLogout={onLogout} />;
 };

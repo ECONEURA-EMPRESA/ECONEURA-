@@ -4,9 +4,34 @@ import {
     CalendarDays, Megaphone, FileText, Gauge, Activity as ActivityIcon, FileBarChart2,
     MessageCircle, ListChecks, Bug, Radar, Inbox, Mail, TrendingUp, ClipboardList
 } from 'lucide-react';
-import type { Department, Agent } from '../types/agent';
-export type { Department, Agent };
 
+export interface Agent {
+    id: string;
+    title: string;
+    desc: string;
+    pills?: string[];
+}
+
+export interface Department {
+    id: string;
+    name: string;
+    chips: string[];
+    neura: {
+        title: string;
+        subtitle: string;
+        tags: string[];
+        value?: {
+            timeSavedHoursMonth: number;    // Horas ahorradas/mes
+            valueEurMonth: number;           // Valor en EUR/mes
+            roiPercentage: number;           // ROI %
+            problem: string;                 // Problema que resuelve
+            solution: string;                // Solución que ofrece
+        };
+    };
+    agents: Agent[];
+}
+
+// Iconos por departamento
 export const DeptIcon: Record<string, React.ElementType> = {
     CEO: Crown,
     IA: Brain,

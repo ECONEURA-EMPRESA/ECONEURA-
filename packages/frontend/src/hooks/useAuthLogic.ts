@@ -47,16 +47,17 @@ export const useAuthLogic = () => {
         setLoading(true);
 
         try {
-            // Safety check for Firebase Init
-            if (!auth || !auth.signInWithEmailAndPassword) {
+            // Safety check for Firebase Init - CAST TO ANY TO AVOID TS ERROR
+            const safeAuth = auth as any;
+            if (!safeAuth || !safeAuth.signInWithEmailAndPassword) {
                 throw new Error('APP_CONFIG_ERROR: Firebase no está configurado. Revisa tu archivo .env');
             }
 
             let userCredential;
             if (mode === 'login') {
-                userCredential = await signInWithEmailAndPassword(auth, formState.email, formState.password);
+                userCredential = await signInWithEmailAndPassword(safeAuth, formState.email, formState.password);
             } else {
-                userCredential = await createUserWithEmailAndPassword(auth, formState.email, formState.password);
+                userCredential = await createUserWithEmailAndPassword(safeAuth, formState.email, formState.password);
                 // Optional: Update profile with name
                 // await updateProfile(userCredential.user, { displayName: formState.name });
             }
