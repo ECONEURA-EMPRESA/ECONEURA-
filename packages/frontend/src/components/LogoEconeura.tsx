@@ -63,7 +63,7 @@ export function LogoEconeura({
 
         {/* Image Container */}
         <div
-          className="absolute inset-2 rounded-full overflow-hidden flex items-center justify-center bg-slate-900 z-10"
+          className="absolute inset-3 rounded-full overflow-hidden flex items-center justify-center bg-slate-900 z-10"
         >
           <img
             src={logoImage || '/logo-v2.png'}
