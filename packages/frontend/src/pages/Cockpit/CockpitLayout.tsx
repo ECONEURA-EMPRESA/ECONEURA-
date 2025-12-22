@@ -5,7 +5,7 @@ import { EconeuraMainContent } from '../../components/EconeuraMainContent';
 import { NEURA_DATA as departments } from '../../data/neuraData';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import '../../styles/cockpit.css';
+import { useNavigate } from 'react-router-dom';
 
 interface CockpitLayoutProps {
     user?: {
@@ -17,25 +17,25 @@ interface CockpitLayoutProps {
     onLogout?: () => void;
 }
 
-export const CockpitLayout: React.FC<CockpitLayoutProps> = () => {
-    const { user, logout } = useAuth();
+export const CockpitLayout: React.FC<CockpitLayoutProps> = ({ user, onLogout }) => {
+    const { logout } = useAuth();
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeDeptId, setActiveDeptId] = useState('CEO');
 
     const activeDepartment = departments.find(d => d.id === activeDeptId) || departments[0];
 
+    // ... rest of implementation matching previous working state ...
     const handleOpenChat = () => {
         navigate(`/chat/${activeDeptId.toLowerCase()}`);
     };
 
     const handleExecuteAgent = (agentId: string) => {
-        // Future implementation: Open agent execution modal or specialized view
         navigate(`/chat/${activeDeptId.toLowerCase()}?agent=${agentId}`);
     };
 
     return (
-        <div className="flex h-screen cockpitContainer text-white overflow-hidden">
+        <div className="flex h-screen bg-neutral-950 text-white overflow-hidden">
             <EconeuraSidebar
                 departments={departments}
                 activeDept={activeDeptId}

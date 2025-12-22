@@ -43,7 +43,7 @@ export function EconeuraSidebar({
       />
 
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full z-50 sidebar transition-all duration-300 ease-in-out">
+      <aside className="fixed left-0 top-0 h-full w-80 bg-white dark:bg-gray-900 border-r border-slate-200/40 dark:border-gray-700/40 z-50 transform transition-transform duration-300 ease-in-out">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
