@@ -143,7 +143,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 {/* Error message */}
                 {error && (
                     <div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-2xl text-red-200 text-sm backdrop-blur-xl animate-shake">
+                        <p className="font-bold">Error de Acceso:</p>
                         {error}
+                        <br />
+                        <span className="text-xs opacity-70 block mt-2">ID incidente: {Math.floor(Math.random() * 1000)}</span>
                     </div>
                 )}
 
