@@ -12,8 +12,8 @@ const dimensionMap: Record<NonNullable<LogoEconeuraProps['size']>, number> = {
   xs: 32,
   sm: 40,
   md: 56,
-  lg: 72,
-  xl: 88
+  lg: 96,
+  xl: 128
 };
 
 const textSizeMap: Record<NonNullable<LogoEconeuraProps['size']>, string> = {
