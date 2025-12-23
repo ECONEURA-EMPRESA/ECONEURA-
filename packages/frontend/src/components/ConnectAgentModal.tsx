@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, ExternalLink, Zap, Workflow, MessageSquare, Cpu } from 'lucide-react';
+import { X, Check, ExternalLink, Zap, Workflow, MessageSquare, Cpu, Sparkles } from 'lucide-react';
 
 interface ConnectAgentModalProps {
   isOpen: boolean;
@@ -30,6 +30,17 @@ const PROVIDERS: Provider[] = [
     bgColor: 'bg-purple-50',
     borderColor: 'border-purple-200',
     docs: 'https://www.make.com/en/help/webhooks'
+  },
+
+  {
+    id: 'google-opal',
+    name: 'Google Opal',
+    icon: Sparkles,
+    description: 'Automatización nativa de Google Labs (No-Code).',
+    color: 'text-indigo-600',
+    bgColor: 'bg-indigo-50',
+    borderColor: 'border-indigo-200',
+    docs: 'https://opal.google.com/docs'
   },
   {
     id: 'n8n',
@@ -197,7 +208,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnect, agent }: Connect
                     type="url"
                     value={webhookUrl}
                     onChange={(e) => setWebhookUrl(e.target.value)}
-                    placeholder={`https://hook.${selectedProvider === 'make' ? 'eu2.make.com' : selectedProvider === 'n8n' ? 'app.n8n.cloud' : 'api.openai.com'}/...`}
+                    placeholder={`https://hook.${selectedProvider === 'make' ? 'eu2.make.com' : selectedProvider === 'google-opal' ? 'opal.googleapis.com' : selectedProvider === 'n8n' ? 'app.n8n.cloud' : 'api.openai.com'}/...`}
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none text-sm font-mono"
                   />
                   <p className="mt-2 text-xs text-slate-500">
@@ -216,6 +227,13 @@ export function ConnectAgentModal({ isOpen, onClose, onConnect, agent }: Connect
                         <li>Ve a Make.com y crea un nuevo scenario</li>
                         <li>Añade un módulo "Webhook" como trigger</li>
                         <li>Copia la URL generada y pégala aquí</li>
+                      </>
+                    )}
+                    {selectedProvider === 'google-opal' && (
+                      <>
+                        <li>Entra a Google Opal Studio</li>
+                        <li>Crea un "Automation Flow" nuevo</li>
+                        <li>Habilita "External Trigger" y copia la URL</li>
                       </>
                     )}
                     {selectedProvider === 'n8n' && (
