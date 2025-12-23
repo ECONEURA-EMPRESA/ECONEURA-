@@ -133,147 +133,151 @@ export async function createServer() {
     next();
   }, express.static(uploadsDir));
 
-  // ✅ CRÍTICO: Upload routes ANTES de security middleware (multer necesita procesar multipart/form-data primero)
+  // ✅ CRÍTICO: Upload routes ANTES de security middleware
   try {
     app.use('/api/uploads', uploadRoutes);
-    logger.info('[Server] Rutas de upload registradas (antes de security middleware)');
-  } catch (error) {
-    logger.error('[Server] Error cargando rutas de upload', {
-      error: error instanceof Error ? error.message : String(error)
-    });
-    if (process.env['NODE_ENV'] === 'production') {
-      throw error;
-    }
-  }
+    logger.info('[Server] Rutas de upload registradas');
+  } catch (error) { /* ... */ }
 
-  // Security middleware (sanitización, payload size, CSRF, MIME validation)
-  // ✅ Excluir /api/uploads porque multer ya procesó el archivo
-  app.use((req, res, next) => {
-    if (req.path.startsWith('/api/uploads')) {
-      return next(); // Saltar security middleware para uploads
-    }
-    defaultSecurityMiddleware(req, res, next);
+  // ✅ SERVE WELL-KNOWN (Opal Manifest)
+  app.use('/.well-known', express.static(path.join(process.cwd(), 'public/.well-known')));
+
+  logger.error('[Server] Error cargando rutas de upload', {
+    error: error instanceof Error ? error.message : String(error)
   });
-
-  // Health checks (sin rate limiting ni auth - deben ser rápidos y públicos)
-  app.get('/health', basicHealthCheck); // Health check básico (rápido)
-  app.get('/api/health', fullHealthCheck); // Health check completo (verifica dependencias)
-  app.get('/api/health/live', livenessProbe); // Liveness probe (Kubernetes)
-  app.get('/api/health/ready', readinessProbe); // Readiness probe (Kubernetes)
-
-  // CRM Webhooks (sin auth, pero con HMAC y rate limiting)
-  // DEBE estar ANTES de authMiddleware porque son públicos
-  try {
-    app.use('/api/crm/webhooks', webhookRoutes);
-    logger.info('[Server] Rutas de webhooks CRM registradas');
-  } catch (error) {
-    logger.error('[Server] Error cargando rutas de webhooks CRM', {
-      error: error instanceof Error ? error.message : String(error)
-    });
-    // En desarrollo, continuar sin webhooks; en producción, fallar
-    if (process.env['NODE_ENV'] === 'production') {
-      throw error;
-    }
+  if (process.env['NODE_ENV'] === 'production') {
+    throw error;
   }
+}
 
-  // ✅ PUBLIC CHAT (Bypass Auth for fixing 403 issues)
-  // User requested "api that works". Moving this before authMiddleware to ensure access.
-  app.use(neuraChatRoutes);
-
-  // Rate limiting específico por ruta (PUBLIC)
-  app.use('/api/neuras/:neuraId/chat', chatLimiter);
-
-  // Auth routes (ANTES de authMiddleware, pero con rate limiting)
-  try {
-    app.use('/api/auth', authRoutes);
-    logger.info('[Server] Rutas de autenticación registradas');
-  } catch (error) {
-    logger.error('[Server] Error cargando rutas de autenticación', {
-      error: error instanceof Error ? error.message : String(error)
-    });
-    if (process.env['NODE_ENV'] === 'production') {
-      throw error;
-    }
+// Security middleware (sanitización, payload size, CSRF, MIME validation)
+// ✅ Excluir /api/uploads porque multer ya procesó el archivo
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/uploads')) {
+    return next(); // Saltar security middleware para uploads
   }
+  defaultSecurityMiddleware(req, res, next);
+});
 
-  // Root Endpoint
-  app.get('/', (_req, res) => {
-    res.json({
-      name: 'ECONEURA API',
-      version: '1.0.0',
-      environment: process.env.NODE_ENV || 'development',
-      status: 'running'
-    });
+// Health checks (sin rate limiting ni auth - deben ser rápidos y públicos)
+app.get('/health', basicHealthCheck); // Health check básico (rápido)
+app.get('/api/health', fullHealthCheck); // Health check completo (verifica dependencias)
+app.get('/api/health/live', livenessProbe); // Liveness probe (Kubernetes)
+app.get('/api/health/ready', readinessProbe); // Readiness probe (Kubernetes)
+
+// CRM Webhooks (sin auth, pero con HMAC y rate limiting)
+// DEBE estar ANTES de authMiddleware porque son públicos
+try {
+  app.use('/api/crm/webhooks', webhookRoutes);
+  logger.info('[Server] Rutas de webhooks CRM registradas');
+} catch (error) {
+  logger.error('[Server] Error cargando rutas de webhooks CRM', {
+    error: error instanceof Error ? error.message : String(error)
   });
-
-  // Rate limiting global
-  app.use(globalLimiter);
-
-  // A partir de aquí, todas las demás rutas requieren contexto de autenticación
-  app.use(authMiddleware);
-
-  // Rate limiting específico por ruta
-  // app.use('/api/neuras/:neuraId/chat', chatLimiter); // Moved up
-  // Auth routes usarían authLimiter (cuando existan)
-
-  app.use(chatRoutes);
-  app.use(conversationRoutes);
-  // app.use(neuraChatRoutes); // Moved before authMiddleware
-  try {
-    app.use(invokeRoutes); // Endpoint /api/invoke/:agentId para compatibilidad con frontend
-    logger.info('[Server] Rutas de invoke registradas');
-  } catch (error) {
-    logger.error('[Server] Error cargando rutas de invoke', {
-      error: error instanceof Error ? error.message : String(error)
-    });
-    if (process.env['NODE_ENV'] === 'production') {
-      throw error;
-    }
+  // En desarrollo, continuar sin webhooks; en producción, fallar
+  if (process.env['NODE_ENV'] === 'production') {
+    throw error;
   }
-  app.use('/api/agents', agentsRoutes);
-  app.use('/api/neura-agents', agentsRoutes); // Alias para compatibilidad con frontend
-  app.use('/api/library', libraryRoutes);
-  app.use('/api/metrics', metricsRoutes); // Sin auth para Prometheus scraping
+}
 
-  // CRM API (con auth normal)
-  try {
-    app.use('/api/crm', crmRoutes);
-    logger.info('[Server] Rutas CRM registradas');
-  } catch (error) {
-    logger.error('[Server] Error cargando rutas CRM', {
-      error: error instanceof Error ? error.message : String(error)
-    });
-    // En desarrollo, continuar sin CRM; en producción, fallar
-    if (process.env['NODE_ENV'] === 'production') {
-      throw error;
-    }
+// ✅ PUBLIC CHAT (Bypass Auth for fixing 403 issues)
+// User requested "api that works". Moving this before authMiddleware to ensure access.
+app.use(neuraChatRoutes);
+
+// Rate limiting específico por ruta (PUBLIC)
+app.use('/api/neuras/:neuraId/chat', chatLimiter);
+
+// Auth routes (ANTES de authMiddleware, pero con rate limiting)
+try {
+  app.use('/api/auth', authRoutes);
+  logger.info('[Server] Rutas de autenticación registradas');
+} catch (error) {
+  logger.error('[Server] Error cargando rutas de autenticación', {
+    error: error instanceof Error ? error.message : String(error)
+  });
+  if (process.env['NODE_ENV'] === 'production') {
+    throw error;
   }
+}
 
-  // ✅ BILLING API (SaaS)
-  try {
-    const { billingRoutes } = await import('../../billing/api/billingRoutes');
-    app.use('/api/billing', billingRoutes);
-    logger.info('[Server] Rutas BILLING (Stripe) registradas');
-  } catch (error) {
-    logger.warn('[Server] Error cargando rutas Billing', { error: String(error) });
+// Root Endpoint
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'ECONEURA API',
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    status: 'running'
+  });
+});
+
+// Rate limiting global
+app.use(globalLimiter);
+
+// A partir de aquí, todas las demás rutas requieren contexto de autenticación
+app.use(authMiddleware);
+
+// Rate limiting específico por ruta
+// app.use('/api/neuras/:neuraId/chat', chatLimiter); // Moved up
+// Auth routes usarían authLimiter (cuando existan)
+
+app.use(chatRoutes);
+app.use(conversationRoutes);
+// app.use(neuraChatRoutes); // Moved before authMiddleware
+try {
+  app.use(invokeRoutes); // Endpoint /api/invoke/:agentId para compatibilidad con frontend
+  logger.info('[Server] Rutas de invoke registradas');
+} catch (error) {
+  logger.error('[Server] Error cargando rutas de invoke', {
+    error: error instanceof Error ? error.message : String(error)
+  });
+  if (process.env['NODE_ENV'] === 'production') {
+    throw error;
   }
+}
+app.use('/api/agents', agentsRoutes);
+app.use('/api/neura-agents', agentsRoutes); // Alias para compatibilidad con frontend
+app.use('/api/library', libraryRoutes);
+app.use('/api/metrics', metricsRoutes); // Sin auth para Prometheus scraping
 
-  // ✅ Mejora 8: Documentación automática de API
-  try {
-    const { apiDocsRoutes } = await import('./routes/apiDocs');
-    app.use(apiDocsRoutes);
-    logger.info('[Server] Rutas de documentación API registradas');
-  } catch (error) {
-    logger.warn('[Server] Error cargando rutas de documentación (no crítico)', {
-      error: error instanceof Error ? error.message : String(error)
-    });
-    // No crítico, continuar sin docs
+// CRM API (con auth normal)
+try {
+  app.use('/api/crm', crmRoutes);
+  logger.info('[Server] Rutas CRM registradas');
+} catch (error) {
+  logger.error('[Server] Error cargando rutas CRM', {
+    error: error instanceof Error ? error.message : String(error)
+  });
+  // En desarrollo, continuar sin CRM; en producción, fallar
+  if (process.env['NODE_ENV'] === 'production') {
+    throw error;
   }
+}
 
-  // Error handler al final (debe ser el último middleware)
-  app.use(errorHandler);
+// ✅ BILLING API (SaaS)
+try {
+  const { billingRoutes } = await import('../../billing/api/billingRoutes');
+  app.use('/api/billing', billingRoutes);
+  logger.info('[Server] Rutas BILLING (Stripe) registradas');
+} catch (error) {
+  logger.warn('[Server] Error cargando rutas Billing', { error: String(error) });
+}
 
-  return app;
+// ✅ Mejora 8: Documentación automática de API
+try {
+  const { apiDocsRoutes } = await import('./routes/apiDocs');
+  app.use(apiDocsRoutes);
+  logger.info('[Server] Rutas de documentación API registradas');
+} catch (error) {
+  logger.warn('[Server] Error cargando rutas de documentación (no crítico)', {
+    error: error instanceof Error ? error.message : String(error)
+  });
+  // No crítico, continuar sin docs
+}
+
+// Error handler al final (debe ser el último middleware)
+app.use(errorHandler);
+
+return app;
 }
 
 export type AppServer = ReturnType<typeof createServer>;

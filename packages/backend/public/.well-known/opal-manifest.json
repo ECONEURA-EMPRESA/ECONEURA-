@@ -1,0 +1,19 @@
+{
+    "schema_version": "v1",
+    "name_for_model": "Econeura AI Cloud",
+    "name_for_human": "Econeura",
+    "description_for_model": "Interact with Econeura Enterprise Agents to query business metrics, trigger workflows, and manage organizational data.",
+    "description_for_human": "Connect your Business Intelligence to Google Opal.",
+    "auth": {
+        "type": "user_http",
+        "authorization_type": "bearer"
+    },
+    "api": {
+        "type": "openapi",
+        "url": "https://econeura-109cc.web.app/api/docs/openapi.json",
+        "is_user_authenticated": true
+    },
+    "logo_url": "https://econeura-109cc.web.app/logo-v2.png",
+    "contact_email": "support@econeura.com",
+    "legal_info_url": "https://econeura-109cc.web.app/legal"
+}

@@ -771,6 +771,13 @@ Crea un agente y conéctalo a Make.
             {/* Network Status Indicator (SaaS Feature) */}
             <NetworkStatusIndicator darkMode={darkMode} />
 
+            {/* Opal Automation Status */}
+            <div className={`hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border transition-colors ${darkMode ? 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30' : 'bg-indigo-50 text-indigo-600 border-indigo-200'
+              }`}>
+              <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+              GOOGLE OPAL
+            </div>
+
             {/* ECONEURA text con relieve */}
             <div className="relative">
               {/* Sombra inferior para relieve */}
