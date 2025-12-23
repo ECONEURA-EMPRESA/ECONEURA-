@@ -267,6 +267,32 @@ interface EconeuraCockpitProps {
   onLogout?: () => void;
 }
 
+// Internal Component: Network Status
+function NetworkStatusIndicator({ darkMode }: { darkMode: boolean }) {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  if (isOnline) return null; // Invisible when online (clean UI)
+
+  return (
+    <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold animate-pulse ${darkMode ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-red-100 text-red-600'
+      }`}>
+      <div className="w-2 h-2 rounded-full bg-red-500" />
+      SIN CONEXIÓN
+    </div>
+  );
+}
+
 export default function EconeuraCockpit({ user, onLogout }: EconeuraCockpitProps) {
   // STATE PERSISTENCE
   const [activeDept, setActiveDept] = useState(() => {
@@ -741,6 +767,9 @@ Crea un agente y conéctalo a Make.
             </button>
 
             <HeaderLogo />
+
+            {/* Network Status Indicator (SaaS Feature) */}
+            <NetworkStatusIndicator darkMode={darkMode} />
 
             {/* ECONEURA text con relieve */}
             <div className="relative">

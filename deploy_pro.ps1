@@ -29,8 +29,8 @@ git push origin main
 if ($LASTEXITCODE -ne 0) { Write-Warning "Git push warning (might be up to date)" }
 
 # 4. FIREBASE DEPLOY
-Write-Host "☁️  Deploying to Google Cloud (Firebase Hosting)..." -ForegroundColor Yellow
-npx firebase deploy --only hosting
+Write-Host "☁️  Deploying to Google Cloud (Firebase Hosting + Rules)..." -ForegroundColor Yellow
+npx firebase deploy --only hosting, firestore, storage
 
 Write-Host "✅ DEPLOYMENT SUCCESSFUL!" -ForegroundColor Green
 Write-Host "👉 LIVE URL: https://econeura-109cc.web.app" -ForegroundColor Cyan
