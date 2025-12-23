@@ -20,17 +20,23 @@
  * ```
  */
 export function getApiUrl(): string {
+  // Priority 1: Runtime/Build-time environment variable
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+
   if (typeof window === 'undefined') {
-    // SSR - usar variable de entorno o default
+    // SSR fallback
     return process.env.VITE_API_URL || 'http://localhost:3000';
   }
 
   const hostname = window.location.hostname;
   const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
 
+  // Last resort fallbacks
   return isLocalhost
     ? 'http://localhost:3000'
-    : 'https://econeura-backend-production.azurewebsites.net';
+    : ''; // Return empty or a verified production URL if known. Empty string often signals "relative" in some configs, or let it fail gracefully.
 }
 
 /**

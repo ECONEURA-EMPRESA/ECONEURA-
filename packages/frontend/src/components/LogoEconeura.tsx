@@ -24,6 +24,14 @@ const textSizeMap: Record<NonNullable<LogoEconeuraProps['size']>, string> = {
   xl: 'text-3xl'
 };
 
+const paddingMap: Record<NonNullable<LogoEconeuraProps['size']>, string> = {
+  xs: 'p-0.5',
+  sm: 'p-1',
+  md: 'p-1.5',
+  lg: 'p-2',
+  xl: 'p-3'
+};
+
 export function LogoEconeura({
   size = 'md',
   showText = true,
@@ -35,6 +43,8 @@ export function LogoEconeura({
   }, []);
 
   const dimension = dimensionMap[size] ?? 56;
+  const paddingClass = paddingMap[size] ?? 'p-1.5';
+
   const ringGradient = darkMode
     ? 'linear-gradient(135deg, rgba(16,185,129,0.8), rgba(6,182,212,0.8), rgba(59,130,246,0.8))'
     : 'linear-gradient(135deg, rgba(16,185,129,0.5), rgba(6,182,212,0.5), rgba(59,130,246,0.5))';
@@ -42,6 +52,9 @@ export function LogoEconeura({
   const midOffset = Math.round(dimension * 0.14);
   const outerOffset = Math.round(dimension * 0.2);
   const glowOffset = Math.round(dimension * 0.26);
+  // Reduced inset for small sizes to maximize visible area
+  const insetClass = (size === 'xs' || size === 'sm') ? 'inset-1' : 'inset-2';
+
   const ringPadding = Math.max(2, Math.round(dimension * 0.03));
   const innerInset = Math.max(2, Math.round(dimension * 0.05));
 
@@ -63,7 +76,7 @@ export function LogoEconeura({
 
         {/* Image Container */}
         <div
-          className="absolute inset-2 rounded-full overflow-hidden flex items-center justify-center bg-slate-900 z-10 p-3"
+          className={`absolute ${insetClass} rounded-full overflow-hidden flex items-center justify-center bg-slate-900 z-10 ${paddingClass}`}
         >
           <img
             src={logoImage || '/logo-v2.png'}
